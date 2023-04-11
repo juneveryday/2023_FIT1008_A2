@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from mountain import Mountain
+from data_structures.linked_stack import LinkedStack
 
 from typing import TYPE_CHECKING, Union
 
@@ -133,7 +134,21 @@ class Trail:
 
     def follow_path(self, personality: WalkerPersonality) -> None:
         """Follow a path and add mountains according to a personality."""
-        raise NotImplementedError()
+
+        temp_stack_follow = LinkedStack()
+        temp_new_trail = self
+
+        temp_new_trail.traverse_trail(personality = personality, stack = temp_stack_follow)
+
+        while not temp_stack_follow.is_empty():
+
+            temp_new_trail = temp_stack_follow.pop()
+
+            temp_new_trail.traverse_trail(personality = personality, stack = temp_stack_follow)
+
+        return
+
+
 
     def collect_all_mountains(self) -> list[Mountain]:
         """Returns a list of all mountains on the trail."""
@@ -147,3 +162,34 @@ class Trail:
         Paths are unique if they take a different branch, even if this results in the same set of mountains.
         """
         raise NotImplementedError()
+
+
+
+    def traverse_trail(self, personality : WalkerPersonality, stack : LinkedStack) -> None:
+        
+        temp_new_trail = self
+
+        while temp_new_trail.store != None:
+            if isinstance (temp_new_trail.store, TrailSeries) :
+                personality.add_mountain(temp_new_trail.store.mountain)
+                temp_new_trail = temp_new_trail.store.following
+
+            elif isinstance (temp_new_trail.store, TrailSplit) :
+                stack.push(temp_new_trail.store.path_follow)
+
+                if personality.select_branch(top_branch = temp_new_trail.store.path_top , bottom_branch = temp_new_trail.store.path_bottom) == True:
+                    temp_new_trail = temp_new_trail.store.path_top
+
+                else:
+                    temp_new_trail = temp_new_trail.store.path_bottom
+
+        return
+
+        
+                
+
+
+
+
+        
+
