@@ -27,8 +27,22 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
     HASH_BASE = 31
 
-    def __init__(self, sizes:list|None=None, internal_sizes:list|None=None) -> None:
-        raise NotImplementedError()
+    def __init__(self, sizes : list|None = None, internal_sizes : list|None = None) -> None:
+
+        self.INTERNAL_TABLE_SIZES = self.TABLE_SIZES
+
+        if sizes != None:
+            self.TABLE_SIZES = sizes
+
+        self.outer_size_index = 0
+        self.outer_hash_table : ArrayR[tuple[K1, LinearProbeTable[K2, V]]] = ArrayR(self.TABLE_SIZES[self.outer_size_index])
+        self.outer_count = 0
+            
+        
+        if internal_sizes != None:
+            self.INTERNAL_TABLE_SIZES = internal_sizes
+
+
 
     def hash1(self, key: K1) -> int:
         """
@@ -65,7 +79,41 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         :raises KeyError: When the key pair is not in the table, but is_insert is False.
         :raises FullError: When a table is full and cannot be inserted.
         """
-        raise NotImplementedError()
+
+        outer_position = self.hash1(key1)
+
+        for _ in range(self.table_size):
+
+            if self.outer_hash_table[outer_position] is None:
+                if is_insert:
+
+                    internal_hash_table =  LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
+                    internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table)
+                    self.outer_hash_table[outer_position] = (key1, internal_hash_table)
+                    self.outer_count += 1
+
+                    inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
+
+                    return (outer_position, inner_position)
+
+                else:
+                    raise KeyError(key1)
+
+            elif self.outer_hash_table[outer_position][0] == key1:
+                internal_hash_table = self.outer_hash_table[outer_position][1]
+                inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
+
+                return (outer_position , inner_position)
+                
+            else:
+                outer_position = (outer_position + 1) % (self.table_size)
+
+        if is_insert:
+            raise FullError("Table is full!")
+        else:
+            raise KeyError(key1)
+
+
 
     def iter_keys(self, key:K1|None=None) -> Iterator[K1|K2]:
         """
@@ -81,7 +129,21 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
-        raise NotImplementedError()
+        key_list = []
+
+        for item in self.outer_hash_table:
+            if item != None:
+                key_item, inner_table_item = item
+                if key != None:
+                    if key == key_item:
+                        return inner_table_item.keys()
+                    else:
+                        continue
+                else:
+                    key_list.append(key_item)
+
+        return key_list
+
 
     def iter_values(self, key:K1|None=None) -> Iterator[V]:
         """
@@ -97,7 +159,26 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = None: returns all values in the table.
         key = x: returns all values for top-level key x.
         """
-        raise NotImplementedError()
+
+        value_list = []
+        
+        for item in self.outer_hash_table:
+            if item != None: 
+                key_item, inner_table_item = item
+                if key != None:
+                    if key == key_item:
+                        return inner_table_item.values()
+                    else:
+                        continue
+
+                else:
+                    temp_list = inner_table_item.values()
+
+                    for i in temp_list:
+                        value_list.append(i)
+                    
+        return value_list
+
 
     def __contains__(self, key: tuple[K1, K2]) -> bool:
         """
@@ -118,14 +199,34 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+
+        key1 = key[0]
+        key2 = key[1]
+
+        outer_index, inner_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
+        inner_table = self.outer_hash_table[outer_index][1]
+        return inner_table[inner_index][1]
+
 
     def __setitem__(self, key: tuple[K1, K2], data: V) -> None:
         """
         Set an (key, value) pair in our hash table.
         """
 
-        raise NotImplementedError()
+        key1 = key[0]
+        key2 = key[1]
+
+        indices : tuple[int, int] = self._linear_probe(key1 = key1, key2 = key2, is_insert = True)
+        outer_key1_index = indices[0]
+        inner_key2_index = indices[1]
+
+        inner_table = self.outer_hash_table[outer_key1_index][1]
+        inner_table[key2] = data
+
+        if len(self) > self.table_size / 2:
+            self._rehash()
+
+        
 
     def __delitem__(self, key: tuple[K1, K2]) -> None:
         """
@@ -133,7 +234,33 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+        key1 = key[0]
+        key2 = key[1]
+
+        indices : tuple[int, int] = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
+        outer_key1_index = indices[0]
+        inner_key2_index = indices[1]
+
+        inner_table = self.outer_hash_table[outer_key1_index][1]
+        del inner_table[key2]
+
+        if len(inner_table) == 0:
+            self.outer_hash_table[outer_key1_index] = None
+            self.outer_count -= 1
+
+            # Start moving over the cluster
+            outer_key1_index = (outer_key1_index + 1) % self.table_size
+
+            while self.outer_hash_table[outer_key1_index] is not None:
+                key1_new, value = self.outer_hash_table[outer_key1_index]
+                self.outer_hash_table[outer_key1_index] = None
+
+                # Reinsert.
+                new_outer_index, new_inner_index = self._linear_probe(key1_new, key2, True)
+                self.outer_hash_table[new_outer_index] = (key1_new, value)
+                outer_key1_index = (outer_key1_index + 1) % self.table_size
+
+    
 
     def _rehash(self) -> None:
         """
@@ -143,19 +270,41 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         :complexity worst: O(N*hash(K) + N^2*comp(K)) Lots of probing.
         Where N is len(self)
         """
-        raise NotImplementedError()
 
+        old_outer_hash_table = self.outer_hash_table
+        self.outer_size_index += 1
+
+        if self.outer_size_index == self.table_size:
+            return
+
+
+        self.outer_hash_table : ArrayR[tuple[K1, LinearProbeTable[K2, V]]] = ArrayR(self.TABLE_SIZES[self.outer_size_index])
+        self.outer_count = 0
+
+
+        for item in old_outer_hash_table:
+            if item != None:
+                key1_new, value = item
+
+                new_outer_index, new_inner_index = self._linear_probe(key1_new, key1_new, True)
+                self.outer_hash_table[new_outer_index] = (key1_new, value)
+                
+
+
+    @property
     def table_size(self) -> int:
         """
         Return the current size of the table (different from the length)
         """
-        raise NotImplementedError()
-
+        return len(self.outer_hash_table)
+        
+    
     def __len__(self) -> int:
         """
         Returns number of elements in the hash table
         """
-        raise NotImplementedError()
+        return self.outer_count
+    
 
     def __str__(self) -> str:
         """
@@ -163,4 +312,13 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         Not required but may be a good testing tool.
         """
+
+        result = ""
+        for item in self.array:
+            if item is not None:
+                (key, value) = item
+                result += "(" + str(key) + "," + str(value) + ")\n"
+        return result
+
+
         raise NotImplementedError()
