@@ -122,15 +122,17 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all keys in the bottom-hash-table for k.
         """
-        raise NotImplementedError()
+        k_iter = KeyIterator(outer_table = self, key = key)
+        return k_iter
 
     def keys(self, key:K1|None=None) -> list[K1]:
         """
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
-        key_list = []
 
+        key_list = []
+        
         for item in self.outer_hash_table:
             if item != None:
                 key_item, inner_table_item = item
@@ -140,7 +142,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                     else:
                         continue
                 else:
-                    key_list.append(key_item)
+                    key_list.append(key_item)                    
 
         return key_list
 
@@ -152,16 +154,19 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all values in the bottom-hash-table for k.
         """
-        raise NotImplementedError()
+
+        v_iter = ValueIterator(outer_table = self, key = key)
+        return v_iter
+        
 
     def values(self, key:K1|None=None) -> list[V]:
         """
         key = None: returns all values in the table.
         key = x: returns all values for top-level key x.
         """
-
-        value_list = []
         
+        value_list = []
+
         for item in self.outer_hash_table:
             if item != None: 
                 key_item, inner_table_item = item
@@ -242,7 +247,20 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         inner_key2_index = indices[1]
 
         inner_table = self.outer_hash_table[outer_key1_index][1]
+
+        """ if len(self.key_list) != 0:
+            self.key_list.remove(key1)
+            # key 2 not removed
+        
+
+        # doesnt take values and doesnt store index key
+        if len(self.value_list) != 0:
+            self.value_list.remove(inner_table[key2])
+            # key 2 not removed """
+
+
         del inner_table[key2]
+   
 
         if len(inner_table) == 0:
             self.outer_hash_table[outer_key1_index] = None
@@ -321,4 +339,127 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         return result
 
 
-        raise NotImplementedError()
+
+
+class KeyIterator(Iterator[K1|K2]):
+    def __init__ (self, outer_table : DoubleKeyTable , key : K1|None = None) -> None :
+        self.array = outer_table.outer_hash_table
+        self.iterated_key = key
+        self.index_position = 0
+        
+
+    def __iter__(self) -> Iterator[K1|K2]:
+        return self
+
+    def __next__(self) -> K1|K2:
+
+        if self.iterated_key == None:
+            for _ in range (self.index_position, len(self.array)):
+            
+                if self.array[self.index_position] != None:
+                    key_item = self.array[self.index_position][0]
+                    self.index_position += 1
+                    return key_item
+
+                self.index_position += 1
+            
+            raise StopIteration
+        
+        else:
+            inner_table = None
+
+            for item in self.array:
+                if item != None:
+                    key_item, inner_table_item = item
+                    if self.iterated_key == key_item:
+                        inner_table = inner_table_item
+                    else:
+                        continue
+                else:
+                    continue
+
+            if inner_table != None:
+
+                for _ in range (self.index_position, len(inner_table.array)):
+
+                    if inner_table.array[self.index_position] != None:
+                        key_item = inner_table.array[self.index_position][0]
+                        self.index_position += 1
+                        return key_item
+
+                    self.index_position += 1
+
+            raise StopIteration
+
+
+class ValueIterator(Iterator[K1|K2]):
+
+    def __init__ (self, outer_table : DoubleKeyTable , key : K1|None = None) -> None :
+        self.array = outer_table.outer_hash_table
+        self.iterated_key = key
+        self.index_position = 0
+        self.inner_index_position = 0
+
+    def __iter__(self) -> Iterator[K1|K2]:
+        return self
+
+    def __next__(self) -> K1|K2:
+
+        if self.iterated_key == None:
+            for _ in range (self.index_position, len(self.array)):
+            
+                if self.array[self.index_position] != None:
+                    inner_table = self.array[self.index_position][1]
+
+                    for _ in range (self.inner_index_position, len(inner_table.array)):
+                        if inner_table.array[self.inner_index_position] != None:
+                            value_item = inner_table.array[self.inner_index_position][1]
+                            self.inner_index_position += 1
+                            return value_item
+                            
+                        self.inner_index_position += 1
+                        
+                self.index_position += 1
+                self.inner_index_position = 0
+            
+            raise StopIteration
+        
+        else:
+            inner_table = None
+
+            for item in self.array:
+                if item != None:
+                    key_item, inner_table_item = item
+                    if self.iterated_key == key_item:
+                        inner_table = inner_table_item
+                    else:
+                        continue
+                else:
+                    continue
+
+            if inner_table != None:
+
+                for _ in range (self.inner_index_position, len(inner_table.array)):
+
+                    if inner_table.array[self.inner_index_position] != None:
+                        value_item = inner_table.array[self.inner_index_position][1]
+                        self.inner_index_position += 1
+                        return value_item
+
+                    self.inner_index_position += 1
+
+            raise StopIteration
+
+
+
+        
+        
+
+
+
+            
+                
+
+
+
+             
