@@ -37,8 +37,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         self.outer_size_index = 0
         self.outer_hash_table : ArrayR[tuple[K1, LinearProbeTable[K2, V]]] = ArrayR(self.TABLE_SIZES[self.outer_size_index])
         self.outer_count = 0
-            
-        
+                  
         if internal_sizes != None:
             self.INTERNAL_TABLE_SIZES = internal_sizes
 
@@ -83,35 +82,30 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         outer_position = self.hash1(key1)
 
         for _ in range(self.table_size):
-
             if self.outer_hash_table[outer_position] is None:
                 if is_insert:
-
                     internal_hash_table =  LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
                     internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table)
                     self.outer_hash_table[outer_position] = (key1, internal_hash_table)
                     self.outer_count += 1
 
                     inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
-
                     return (outer_position, inner_position)
 
-                else:
-                    raise KeyError(key1)
+                raise KeyError(key1) #else if is_insert is false
 
             elif self.outer_hash_table[outer_position][0] == key1:
                 internal_hash_table = self.outer_hash_table[outer_position][1]
                 inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
-
                 return (outer_position , inner_position)
                 
-            else:
-                outer_position = (outer_position + 1) % (self.table_size)
+            
+            outer_position = (outer_position + 1) % (self.table_size) # else search for the key empty slot
 
         if is_insert:
             raise FullError("Table is full!")
-        else:
-            raise KeyError(key1)
+        
+        raise KeyError(key1) # else if is_insert is false and key1 is not present in the hash table
 
 
 
@@ -122,8 +116,10 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all keys in the bottom-hash-table for k.
         """
+
         k_iter = KeyIterator(outer_table = self, key = key)
         return k_iter
+
 
     def keys(self, key:K1|None=None) -> list[K1]:
         """
@@ -175,7 +171,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                         return inner_table_item.values()
                     else:
                         continue
-
                 else:
                     temp_list = inner_table_item.values()
 
@@ -221,9 +216,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key1 = key[0]
         key2 = key[1]
 
-        indices : tuple[int, int] = self._linear_probe(key1 = key1, key2 = key2, is_insert = True)
-        outer_key1_index = indices[0]
-        inner_key2_index = indices[1]
+        outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = True)
 
         inner_table = self.outer_hash_table[outer_key1_index][1]
         inner_table[key2] = data
@@ -242,9 +235,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key1 = key[0]
         key2 = key[1]
 
-        indices : tuple[int, int] = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
-        outer_key1_index = indices[0]
-        inner_key2_index = indices[1]
+        outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
 
         inner_table = self.outer_hash_table[outer_key1_index][1]
 
@@ -258,9 +249,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             self.value_list.remove(inner_table[key2])
             # key 2 not removed """
 
-
         del inner_table[key2]
-   
 
         if len(inner_table) == 0:
             self.outer_hash_table[outer_key1_index] = None
@@ -292,13 +281,11 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         old_outer_hash_table = self.outer_hash_table
         self.outer_size_index += 1
 
-        if self.outer_size_index == self.table_size:
+        if self.outer_size_index >= len(self.TABLE_SIZES):
             return
-
 
         self.outer_hash_table : ArrayR[tuple[K1, LinearProbeTable[K2, V]]] = ArrayR(self.TABLE_SIZES[self.outer_size_index])
         self.outer_count = 0
-
 
         for item in old_outer_hash_table:
             if item != None:
@@ -332,18 +319,27 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
 
         result = ""
-        for item in self.array:
-            if item is not None:
-                (key, value) = item
-                result += "(" + str(key) + "," + str(value) + ")\n"
+        for item_outer in self.outer_hash_table:
+            if item_outer is not None:
+                (key_outer, inner_table) = item_outer
+
+                """ for item_inner in inner_table.array:
+                    if item_inner is not None:
+                        (key_inner , value) = item_inner
+                        result += "(" + str(key_inner) + "," + str(value) + ")\n" """
+                
+                result += str(key_outer) + ":\n" + str(inner_table)
+                result += "\n"
+
         return result
 
 
 
 
 class KeyIterator(Iterator[K1|K2]):
+
     def __init__ (self, outer_table : DoubleKeyTable , key : K1|None = None) -> None :
-        self.array = outer_table.outer_hash_table
+        self.table = outer_table
         self.iterated_key = key
         self.index_position = 0
         
@@ -354,101 +350,97 @@ class KeyIterator(Iterator[K1|K2]):
     def __next__(self) -> K1|K2:
 
         if self.iterated_key == None:
-            for _ in range (self.index_position, len(self.array)):
-            
-                if self.array[self.index_position] != None:
-                    key_item = self.array[self.index_position][0]
-                    self.index_position += 1
-                    return key_item
-
-                self.index_position += 1
+            temp_key = self.find_key(self.table.outer_hash_table)
+            if temp_key != None:
+                return temp_key
             
             raise StopIteration
         
         else:
             inner_table = None
 
-            for item in self.array:
+            for item in self.table.outer_hash_table:
                 if item != None:
                     key_item, inner_table_item = item
                     if self.iterated_key == key_item:
                         inner_table = inner_table_item
-                    else:
-                        continue
-                else:
-                    continue
 
             if inner_table != None:
-
-                for _ in range (self.index_position, len(inner_table.array)):
-
-                    if inner_table.array[self.index_position] != None:
-                        key_item = inner_table.array[self.index_position][0]
-                        self.index_position += 1
-                        return key_item
-
-                    self.index_position += 1
+                temp_key = self.find_key(inner_table.array)
+                if temp_key != None:
+                    return temp_key
 
             raise StopIteration
 
 
-class ValueIterator(Iterator[K1|K2]):
+    def find_key(self, array : ArrayR) -> K1|K2:
+
+        for _ in range (self.index_position, len(array)):
+
+            if array[self.index_position] != None:
+                key_item = array[self.index_position][0]
+                self.index_position += 1
+                return key_item
+
+            self.index_position += 1
+
+        return None
+
+
+
+class ValueIterator(Iterator[V]):
 
     def __init__ (self, outer_table : DoubleKeyTable , key : K1|None = None) -> None :
-        self.array = outer_table.outer_hash_table
+        self.table = outer_table
         self.iterated_key = key
         self.index_position = 0
         self.inner_index_position = 0
 
-    def __iter__(self) -> Iterator[K1|K2]:
+    def __iter__(self) -> Iterator[V]:
         return self
 
-    def __next__(self) -> K1|K2:
+    def __next__(self) -> V:
 
         if self.iterated_key == None:
-            for _ in range (self.index_position, len(self.array)):
-            
-                if self.array[self.index_position] != None:
-                    inner_table = self.array[self.index_position][1]
 
-                    for _ in range (self.inner_index_position, len(inner_table.array)):
-                        if inner_table.array[self.inner_index_position] != None:
-                            value_item = inner_table.array[self.inner_index_position][1]
-                            self.inner_index_position += 1
-                            return value_item
-                            
-                        self.inner_index_position += 1
+            for _ in range (self.index_position, len(self.table.outer_hash_table)):
+                if self.table.outer_hash_table[self.index_position] != None:
+                    inner_table = self.table.outer_hash_table[self.index_position][1]
+
+                    temp_value = self.find_value(inner_table.array)
+                    if temp_value != None:
+                        return temp_value
                         
                 self.index_position += 1
                 self.inner_index_position = 0
             
-            raise StopIteration
-        
         else:
             inner_table = None
 
-            for item in self.array:
+            for item in self.table.outer_hash_table:
                 if item != None:
-                    key_item, inner_table_item = item
-                    if self.iterated_key == key_item:
-                        inner_table = inner_table_item
-                    else:
-                        continue
-                else:
-                    continue
+                    if self.iterated_key == item[0]:
+                        inner_table = item[1]
 
             if inner_table != None:
+                temp_value = self.find_value(inner_table.array)
+                if temp_value != None:
+                    return temp_value
 
-                for _ in range (self.inner_index_position, len(inner_table.array)):
+        raise StopIteration
 
-                    if inner_table.array[self.inner_index_position] != None:
-                        value_item = inner_table.array[self.inner_index_position][1]
-                        self.inner_index_position += 1
-                        return value_item
 
-                    self.inner_index_position += 1
+    def find_value(self, array : ArrayR) -> V:
 
-            raise StopIteration
+        for _ in range (self.inner_index_position, len(array)):
+            if array[self.inner_index_position] != None:
+                value_item = array[self.inner_index_position][1]
+                self.inner_index_position += 1
+                return value_item
+                
+            self.inner_index_position += 1
+        
+        return None
 
 
 
