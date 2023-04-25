@@ -52,16 +52,20 @@ class TestInfiniteHash(unittest.TestCase):
         self.assertEqual(make_set(res[2]), make_set([m5]))
         self.assertEqual(make_set(res[3]), make_set([m6, m7, m8, m9]))
         
-        mm.add_mountain(m10)
+        # mm.add_mountain(m10)
 
         #print("sorted order is\n " ,mm.mountain_list)
 
-        mm.remove_mountain(m5)
+        # mm.remove_mountain(m5)
 
         #print("remvomed mountain m5\n " ,mm.mountain_list)
+
+        mm.edit_mountain(m5 , m10)
 
         res = mm.group_by_difficulty()
         self.assertEqual(len(res), 4)
 
         self.assertEqual(make_set(res[3]), make_set([m10])) 
+
+        self.assertRaises(KeyError, lambda: mm.remove_mountain(m5))
  
