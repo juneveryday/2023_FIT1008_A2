@@ -20,7 +20,7 @@ class TestInfiniteHash(unittest.TestCase):
         m10 = Mountain("m10", 8, 4)
 
         mo = MountainOrganiser()
-        mo.add_mountains([m1, m2])
+        mo.add_mountains([m2, m1])
 
         self.assertEqual([mo.cur_position(m) for m in [m1, m2]], [0, 1])
         mo.add_mountains([m4, m3])

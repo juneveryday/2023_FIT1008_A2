@@ -20,17 +20,20 @@ class TestInfiniteHash(unittest.TestCase):
         m10 = Mountain("m10", 8, 4)
 
         mm = MountainManager()
-        mm.add_mountain(m1)
-        mm.add_mountain(m2)
-        mm.add_mountain(m3)
-        mm.add_mountain(m6)
         mm.add_mountain(m7)
+        mm.add_mountain(m2)
+        mm.add_mountain(m6)
+        mm.add_mountain(m3)
+        mm.add_mountain(m1)
+
+        print("sorted order is\n " ,mm.mountain_list)
 
         def make_set(my_list):
+            
             """
             Since mountains are unhashable, add a method to get a set of all mountain ids.
-            Ensures that we can compare two lists without caring about order.
-            """
+            Ensures that we can compare two lists without caring about order."""
+            
             return set(id(x) for x in my_list)
 
         self.assertEqual(make_set(mm.mountains_with_difficulty(3)), make_set([m3]))
@@ -48,11 +51,17 @@ class TestInfiniteHash(unittest.TestCase):
         self.assertEqual(make_set(res[1]), make_set([m3, m4]))
         self.assertEqual(make_set(res[2]), make_set([m5]))
         self.assertEqual(make_set(res[3]), make_set([m6, m7, m8, m9]))
-
+        
         mm.add_mountain(m10)
+
+        #print("sorted order is\n " ,mm.mountain_list)
+
         mm.remove_mountain(m5)
+
+        #print("remvomed mountain m5\n " ,mm.mountain_list)
 
         res = mm.group_by_difficulty()
         self.assertEqual(len(res), 4)
 
-        self.assertEqual(make_set(res[3]), make_set([m10]))
+        self.assertEqual(make_set(res[3]), make_set([m10])) 
+ 

@@ -11,14 +11,12 @@ V = TypeVar('V')
 class DoubleKeyTable(Generic[K1, K2, V]):
     """
     Double Hash Table.
-
     Type Arguments:
         - K1:   1st Key Type. In most cases should be string.
                 Otherwise `hash1` should be overwritten.
         - K2:   2nd Key Type. In most cases should be string.
                 Otherwise `hash2` should be overwritten.
         - V:    Value Type.
-
     Unless stated otherwise, all methods have O(1) complexity.
     """
 
@@ -46,7 +44,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def hash1(self, key: K1) -> int:
         """
         Hash the 1st key for insert/retrieve/update into the hashtable.
-
         :complexity: O(len(key))
         """
 
@@ -60,7 +57,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def hash2(self, key: K2, sub_table: LinearProbeTable[K2, V]) -> int:
         """
         Hash the 2nd key for insert/retrieve/update into the hashtable.
-
         :complexity: O(len(key))
         """
 
@@ -74,7 +70,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def _linear_probe(self, key1: K1, key2: K2, is_insert: bool) -> tuple[int, int]:
         """
         Find the correct position for this key in the hash table using linear probing.
-
         :raises KeyError: When the key pair is not in the table, but is_insert is False.
         :raises FullError: When a table is full and cannot be inserted.
         """
@@ -183,7 +178,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def __contains__(self, key: tuple[K1, K2]) -> bool:
         """
         Checks to see if the given key is in the Hash Table
-
         :complexity: See linear probe.
         """
         try:
@@ -196,7 +190,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def __getitem__(self, key: tuple[K1, K2]) -> V:
         """
         Get the value at a certain key
-
         :raises KeyError: when the key doesn't exist.
         """
 
@@ -229,7 +222,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def __delitem__(self, key: tuple[K1, K2]) -> None:
         """
         Deletes a (key, value) pair in our hash table.
-
         :raises KeyError: when the key doesn't exist.
         """
         key1 = key[0]
@@ -243,7 +235,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             self.key_list.remove(key1)
             # key 2 not removed
         
-
         # doesnt take values and doesnt store index key
         if len(self.value_list) != 0:
             self.value_list.remove(inner_table[key2])
@@ -272,7 +263,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def _rehash(self) -> None:
         """
         Need to resize table and reinsert all values
-
         :complexity best: O(N*hash(K)) No probing.
         :complexity worst: O(N*hash(K) + N^2*comp(K)) Lots of probing.
         Where N is len(self)
@@ -314,7 +304,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
     def __str__(self) -> str:
         """
         String representation.
-
         Not required but may be a good testing tool.
         """
 

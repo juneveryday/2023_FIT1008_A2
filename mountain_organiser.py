@@ -9,7 +9,7 @@ class MountainOrganiser:
 
     def __init__(self) -> None:
 
-        self.sorted_mountain_list = []
+        self.sorted_mountain_list : list[Mountain] = []
 
 
     def cur_position(self, mountain: Mountain) -> int:
