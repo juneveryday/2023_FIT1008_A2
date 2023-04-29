@@ -57,6 +57,56 @@ class InfiniteHashTable(Generic[K, V]):
         self.level = 0
         self.assign_key_value(key, value)
 
+        # self.level = 0
+        # table = self.top_level_table
+
+        # while True:
+        #     pos = self.hash(key)
+
+        #     #inside index is not empty
+        #     if isinstance(table[pos], tuple) and isinstance(table[pos][1], ArrayR):
+        #         table = table[pos][1]
+        #         self.level += 1
+        #         print("level is " , self.level)
+        #         print(key)
+        #         continue
+
+        #     elif isinstance(table[pos], tuple) and isinstance(table[pos][1], int):
+        #         collision = table[pos] #lin 1
+        #         print("collision will be :",collision, " in ",pos)
+        #         table[pos] = (collision[0][:self.level],ArrayR(self.TABLE_SIZE))
+        #         table = table[pos][1]
+        #         self.level += 1
+        #         print("level is " , self.level)
+        #         table[self.hash(collision[0])] = collision
+        #         print(" so now, i will make this ",collision, " into ",self.hash(collision[0]),"and",(key,value)," one will be in",self.hash(key))
+        #         table[self.hash(key)] = (key,value)
+                
+                
+        #         while self.hash(collision[0]) == self.hash(key): #lin and link are in same location
+        #             print("However, now it detected we need to do one more hash table!")
+                    
+        #             print("going to make new table in",self.hash(collision[0]))
+        #             table[pos] = (collision[0][:self.level],ArrayR(self.TABLE_SIZE))
+        #             table = table[pos][1]
+        #             self.level += 1
+        #             print("level is " , self.level)
+
+        #             table[self.hash(collision[0])] = collision
+        #             table[self.hash(key)] = (key,value)
+        #             print(" so now, i will make this ",collision, " into ",self.hash(collision[0]),"and",(key,value)," one will be in",self.hash(key))
+        #             print("Done~")
+                
+        #         return
+
+        #     else:
+        #         table[pos] = (key,value)
+        #         self.count += 1
+        #         print("level is " , self.level)
+        #         print("first, i will put this ",table[pos],"into",self.hash(key))
+        #         print("done")
+        #         return
+
         #raise NotImplementedError()
 
 
@@ -103,98 +153,193 @@ class InfiniteHashTable(Generic[K, V]):
 
     def assign_key_value(self, key: K, value: V) -> None:
 
-        index_position = self.hash(key = key)
+        outer_array = self.top_level_table
+        index_position = 0
 
-        if self.top_level_table[index_position] == None:
-            self.top_level_table[index_position] = (key , value)
+        while True:
+            # outer_key , outer_value = outer_array[index_position]
 
-        elif self.top_level_table[index_position][0] == key:
-            self.top_level_table[index_position] = (key , value)
+            # print("outer key and value is " , outer_key , outer_value , "at index " , index_position)
 
-        else:
-            key_outer , value_outer = self.top_level_table[index_position]
+            index_position = self.hash(key = key)
+            print("index position of input key is " , key ,index_position)
+            
+            if outer_array[index_position] == None:
+                outer_array[index_position] = (key,value)
 
-            if key_outer[len(key_outer) - 1] != '*':
-                outer_array = self.top_level_table
-                inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
-                outer_array[index_position] = (key[0 : self.level + 1] + "*", inner_array)
-                
-                print("\ntop test key " , outer_array[index_position][0])
-                print("level is " , self.level)
-                print("inner index is " , index_position)
-                for i in range(len(outer_array)):
+                for i in range (len(outer_array)):
                     if outer_array[i] != None:
-                        print(i, "Top outer array is " , outer_array[i], " outer key is " , key_outer)
+                        print("outer array at index " , i , " is " , outer_array[i])
+
+                return
+
+            elif outer_array[index_position][0] == key:
+                outer_array[index_position] = (key,value)
+
+                for i in range (len(outer_array)):
+                    if outer_array[i] != None:
+                        print("outer array at index " , i , " is " , outer_array[i])
+
+                return
+
+            elif isinstance(outer_array[index_position][1] , int):
+                outer_key , outer_value = outer_array[index_position]
+                print("outer key and value is " , outer_key , outer_value , "at index " , index_position)
+
+                inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
+                outer_array[index_position] = (key[0 : self.level + 1], inner_array)
+
+                print("new key and value is " , outer_array[index_position])
+                
+                self.level += 1
+
+                print("new level is " , self.level)
+                outer_array = inner_array
+                
+                index_position = self.hash(key = outer_key)                   
+                outer_array[index_position] = (outer_key , outer_value)
+
+                print("index position for original key is" , outer_key , index_position)
+
+                continue
 
 
-                while True:    
-                    self.level += 1
-                    print("after level is " , self.level)
-                    inner_index_position = self.hash(key = key_outer)
-                    print("inner position of outer_key " , key_outer , " is " , inner_index_position)
-                    inner_array[inner_index_position] = (key_outer , value_outer)
-                    inner_index_position = self.hash(key = key)
-                    print("inner position of key " , key , " is " , inner_index_position)
+            else: 
+                outer_key , outer_value = outer_array[index_position]
+                print("outer key and value is " , outer_key , outer_value , "at index " , index_position)
+
+                inner_array = outer_value
+
+                print("outer key " , outer_key )
+
+                for i in range (len(inner_array)):
+                        if inner_array[i] != None:
+                            print("inner array at index " , i , " is " , inner_array[i])
+
+                self.level += 1
+                print("next level is " , self.level)
+
+                outer_array = inner_array
+
+                continue
+
+
 
             
-                    if inner_array[inner_index_position] == None:
-                        inner_array[inner_index_position] = (key , value)
+            # outer_key , outer_value = outer_array[index_position]
 
-                        """ for i in range(len(outer_array)):
-                            if outer_array[i] != None:
-                                print(i, "outer array is " , outer_array[i], " outer key is " , key_outer)
+            # print("outer key and value is " , outer_key , outer_value , "at index " , index_position)
+            
+            # if isinstance(outer_value, ArrayR):
+            #     while True:
+            #         inner_array = outer_value
 
-                        print("before level is " , self.level) """
-                        print("INNER FINAL index is " , inner_index_position) 
+            #         print("outer key " , outer_key )
+
+            #         for i in range (len(inner_array)):
+            #                 if inner_array[i] != None:
+            #                     print("inner array at index " , i , " is " , inner_array[i])
+
+            #         self.level += 1
+            #         print("next level is " , self.level)
+
+            #         outer_array = inner_array
+            
+            #         index_position = self.hash(key = key)
+
+            #         print("index position for input key is" , key , index_position)
+
+            #         outer_key , outer_value = outer_array[index_position]
+            
+            #         if outer_array[index_position] == None:
+            #             outer_array[index_position] = (key , value)
+
+            #             for i in range (len(outer_array)):
+            #                 if outer_array[i] != None:
+            #                     print("outer array at index " , i , " is " , outer_array[i])
+
+            #             return
+
+            #         elif isinstance(outer_value, ArrayR):
+            #             print("gone in elif to the next level\n")
                         
+            #             continue
 
-                        break
-
-                    else:
-                        key_outer , value_outer = inner_array[inner_index_position]
-                        outer_array = inner_array
-                        inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
-                        outer_array[inner_index_position] = (key[0 : self.level + 1] + "*" , inner_array)
-
-                        print("\ntest key " , outer_array[inner_index_position][0] , "\n")
-                        
-
-                        for i in range(len(outer_array)):
-                            if outer_array[i] != None:
-                                print(i, "outer array is " , outer_array[i], " outer key is " , key_outer)
-
-                        for i in range(len(inner_array)):
-                            if inner_array[i] != None:
-                                print(i, "inner array is " , inner_array[i], " inner key is " , key)
-
-
-                        
-                        print("inner index is " , inner_index_position)
+            #         else:
+            #             while True:   
                 
-            else:
-                outer_array = self.top_level_table
-                #inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
-                #outer_array[index_position] = (key[0 : self.level + 1] + "*", inner_array)
-                outer_array[index_position][1] = inner_array
+            #                 inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
+            #                 outer_array[index_position] = (key[0 : self.level + 1], inner_array)
 
-                while True: 
-                    self.level += 1
-                    inner_index_position = self.hash(key = key)
+            #                 print("new key and value is " , outer_array[index_position])
+                            
+            #                 self.level += 1
 
-                    if inner_array[inner_index_position] == None:
-                        inner_array[inner_index_position] = (key , value)
-                        break
+            #                 print("new level is " , self.level)
+            #                 outer_array = inner_array
+                            
+            #                 index_position = self.hash(key = outer_key)                   
+            #                 outer_array[index_position] = (outer_key , outer_value)
 
-                    else:
-                        key_outer , value_outer = inner_array[inner_index_position]
+            #                 print("index position for original key is" , outer_key , index_position)
 
-                        outer_array = inner_array
-                        inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
-                        outer_array[index_position] = (key[0 : self.level + 1] + "*", inner_array)
 
-                        inner_index_position = self.hash(key = key_outer)
-                        inner_array[inner_index_position] = (key_outer , value_outer)
+            #                 index_position = self.hash(key = key)
 
-                        if inner_array[inner_index_position] == None:
-                            inner_array[inner_index_position] = (key , value)
-                            break
+            #                 print("index position for input key is" , key , index_position)
+                    
+            #                 if outer_array[index_position] == None:
+            #                     outer_array[index_position] = (key , value)
+
+            #                     for i in range (len(outer_array)):
+            #                         if outer_array[i] != None:
+            #                             print("outer array at index " , i , " is " , outer_array[i])
+
+            #                     return
+
+            #                 else:
+            #                     outer_key , outer_value = outer_array[index_position]
+            #                     print("gone in 30 secs, back to the else")
+
+
+
+            # else:
+            #     while True:   
+                
+            #         inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
+            #         outer_array[index_position] = (key[0 : self.level + 1], inner_array)
+
+            #         print("new key and value is " , outer_array[index_position])
+                    
+            #         self.level += 1
+
+            #         print("new level is " , self.level)
+            #         outer_array = inner_array
+                    
+            #         index_position = self.hash(key = outer_key)                   
+            #         outer_array[index_position] = (outer_key , outer_value)
+
+            #         print("index position for original key is" , outer_key , index_position)
+
+
+            #         index_position = self.hash(key = key)
+
+            #         print("index position for input key is" , key , index_position)
+            
+            #         if outer_array[index_position] == None:
+            #             outer_array[index_position] = (key , value)
+
+            #             for i in range (len(outer_array)):
+            #                 if outer_array[i] != None:
+            #                     print("outer array at index " , i , " is " , outer_array[i])
+
+            #             return
+
+            #         else:
+            #             outer_key , outer_value = outer_array[index_position]
+            #             print("gone in 30 secs, back to the else")
+
+            
+
+                
+            
