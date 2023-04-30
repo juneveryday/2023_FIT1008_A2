@@ -136,15 +136,15 @@ class Trail:
         """Follow a path and add mountains according to a personality."""
 
         temp_stack_follow = LinkedStack()
-        temp_new_trail = self
+        temp_new_trail : Trail = self
 
-        temp_new_trail.traverse_trail(personality = personality, stack = temp_stack_follow)
+        temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality, mountain_list = None)
 
         while not temp_stack_follow.is_empty():
 
             temp_new_trail = temp_stack_follow.pop()
 
-            temp_new_trail.traverse_trail(personality = personality, stack = temp_stack_follow)
+            temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality , mountain_list = None)
 
         return
 
@@ -152,7 +152,27 @@ class Trail:
 
     def collect_all_mountains(self) -> list[Mountain]:
         """Returns a list of all mountains on the trail."""
-        raise NotImplementedError()
+
+        list_of_mountains : list[Mountain] = []
+        temp_stack_follow = LinkedStack()
+        temp_new_trail : Trail = self
+
+        temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = None, mountain_list = list_of_mountains)
+
+        while not temp_stack_follow.is_empty():
+
+            temp_new_trail = temp_stack_follow.pop()
+
+            temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = None , mountain_list = list_of_mountains)
+
+        print("list of mountains is " , list_of_mountains)
+        print("\nlength of list of mountains is " , len(list_of_mountains))
+
+        return list_of_mountains
+
+        
+
+        #raise NotImplementedError()
 
     def length_k_paths(self, k) -> list[list[Mountain]]: # Input to this should not exceed k > 50, at most 5 branches.
         """
@@ -165,23 +185,33 @@ class Trail:
 
 
 
-    def traverse_trail(self, personality : WalkerPersonality, stack : LinkedStack) -> None:
+    def traverse_trail(self, stack : LinkedStack , personality : WalkerPersonality|None = None , mountain_list : list[Mountain] = None) -> None:
         
         temp_new_trail = self
 
         while temp_new_trail.store != None:
             if isinstance (temp_new_trail.store, TrailSeries) :
-                personality.add_mountain(temp_new_trail.store.mountain)
+                if personality != None:
+                    personality.add_mountain(temp_new_trail.store.mountain)
+
+                elif mountain_list != None:
+                    mountain_list.append(temp_new_trail.store.mountain)
+
                 temp_new_trail = temp_new_trail.store.following
 
             elif isinstance (temp_new_trail.store, TrailSplit) :
                 stack.push(temp_new_trail.store.path_follow)
 
-                if personality.select_branch(top_branch = temp_new_trail.store.path_top , bottom_branch = temp_new_trail.store.path_bottom) == True:
-                    temp_new_trail = temp_new_trail.store.path_top
+                if personality != None:
+                    if personality.select_branch(top_branch = temp_new_trail.store.path_top , bottom_branch = temp_new_trail.store.path_bottom) == True:
+                        temp_new_trail = temp_new_trail.store.path_top
 
-                else:
-                    temp_new_trail = temp_new_trail.store.path_bottom
+                    else:
+                        temp_new_trail = temp_new_trail.store.path_bottom
+
+                elif mountain_list != None:
+                    stack.push(temp_new_trail.store.path_bottom)
+                    temp_new_trail = temp_new_trail.store.path_top
 
         return
 
