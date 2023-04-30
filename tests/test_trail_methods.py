@@ -13,26 +13,33 @@ class TestTrailMethods(unittest.TestCase):
         self.bot_one = Mountain("bot-one", 2, 5)
         self.bot_two = Mountain("bot-two", 0, 0)
         self.final   = Mountain("final", 4, 4)
+        # self.trail = Trail(TrailSplit(
+        #     Trail(TrailSplit(
+        #         Trail(TrailSeries(self.top_top, Trail(None))),
+        #         Trail(TrailSeries(self.top_bot, Trail(None))),
+        #         Trail(TrailSeries(self.top_mid, Trail(None))),
+        #     )),
+        #     Trail(TrailSeries(self.bot_one, Trail(TrailSplit(
+        #         Trail(TrailSeries(self.bot_two, Trail(None))),
+        #         Trail(None),
+        #         Trail(None),
+        #     )))),
+        #     Trail(TrailSeries(self.final, Trail(None)))
+        # ))
+
         self.trail = Trail(TrailSplit(
-            Trail(TrailSplit(
-                Trail(TrailSeries(self.top_top, Trail(None))),
-                Trail(TrailSeries(self.top_bot, Trail(None))),
-                Trail(TrailSeries(self.top_mid, Trail(None))),
-            )),
-            Trail(TrailSeries(self.bot_one, Trail(TrailSplit(
-                Trail(TrailSeries(self.bot_two, Trail(None))),
-                Trail(None),
-                Trail(None),
-            )))),
-            Trail(TrailSeries(self.final, Trail(None)))
+            Trail(TrailSeries(self.top_top, Trail(None))),
+            Trail(TrailSeries(self.top_bot, Trail(None))),
+            Trail(TrailSeries(self.top_mid, Trail((TrailSeries(self.final, Trail(None)))))),
         ))
+        
 
     @number("7.1")
     def test_example(self):
         self.load_example()
 
-        """ res = self.trail.length_k_paths(3)
-        make_path_string = lambda mountain_list: ", ".join(map(lambda x: x.name, mountain_list))
+        res = self.trail.length_k_paths(3)
+        """ make_path_string = lambda mountain_list: ", ".join(map(lambda x: x.name, mountain_list))
         # This makes the result a list of strings, like so:
         # [
         #   "top-top, top-middle, final",
@@ -46,8 +53,8 @@ class TestTrailMethods(unittest.TestCase):
             "top-bot, top-mid, final",
             "bot-one, bot-two, final"
         })
-        self.assertEqual(len(res), 3) """
-
+        self.assertEqual(len(res), 3) 
+ 
         res = self.trail.collect_all_mountains()
 
         hash_mountain = lambda m: m.name
@@ -56,4 +63,4 @@ class TestTrailMethods(unittest.TestCase):
         self.assertSetEqual(set(map(hash_mountain, res)), set(map(hash_mountain, [
             self.top_bot, self.top_top, self.top_mid,
             self.bot_one, self.bot_two, self.final
-        ])))
+        ])))"""

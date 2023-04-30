@@ -138,13 +138,13 @@ class Trail:
         temp_stack_follow = LinkedStack()
         temp_new_trail : Trail = self
 
-        temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality, mountain_list = None)
+        temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality)
 
         while not temp_stack_follow.is_empty():
 
             temp_new_trail = temp_stack_follow.pop()
 
-            temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality , mountain_list = None)
+            temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality)
 
         return
 
@@ -154,16 +154,8 @@ class Trail:
         """Returns a list of all mountains on the trail."""
 
         list_of_mountains : list[Mountain] = []
-        temp_stack_follow = LinkedStack()
-        temp_new_trail : Trail = self
 
-        temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = None, mountain_list = list_of_mountains)
-
-        while not temp_stack_follow.is_empty():
-
-            temp_new_trail = temp_stack_follow.pop()
-
-            temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = None , mountain_list = list_of_mountains)
+        self.collect_mountains(mountain_list = list_of_mountains)
 
         print("list of mountains is " , list_of_mountains)
         print("\nlength of list of mountains is " , len(list_of_mountains))
@@ -172,7 +164,6 @@ class Trail:
 
         
 
-        #raise NotImplementedError()
 
     def length_k_paths(self, k) -> list[list[Mountain]]: # Input to this should not exceed k > 50, at most 5 branches.
         """
@@ -181,39 +172,96 @@ class Trail:
 
         Paths are unique if they take a different branch, even if this results in the same set of mountains.
         """
-        raise NotImplementedError()
+
+        # list_of_mountains : list[list[Mountain]] = []
+
+        # self.collect_mountain_list(list_index = 0 , mountain_list = list_of_mountains)
+
+        # print("length of list of list is " , len(list_of_mountains))
+        # for i in range (len(list_of_mountains)):
+        #     print("\nlist of mountains at index " , i , " is " , list_of_mountains[i] , "\n")
+
+        # return list_of_mountains
 
 
 
-    def traverse_trail(self, stack : LinkedStack , personality : WalkerPersonality|None = None , mountain_list : list[Mountain] = None) -> None:
+
+        #raise NotImplementedError()
+
+
+
+    def traverse_trail(self, stack : LinkedStack , personality : WalkerPersonality) -> None:
         
         temp_new_trail = self
 
         while temp_new_trail.store != None:
             if isinstance (temp_new_trail.store, TrailSeries) :
-                if personality != None:
-                    personality.add_mountain(temp_new_trail.store.mountain)
-
-                elif mountain_list != None:
-                    mountain_list.append(temp_new_trail.store.mountain)
-
+                personality.add_mountain(temp_new_trail.store.mountain)
                 temp_new_trail = temp_new_trail.store.following
 
             elif isinstance (temp_new_trail.store, TrailSplit) :
                 stack.push(temp_new_trail.store.path_follow)
-
-                if personality != None:
-                    if personality.select_branch(top_branch = temp_new_trail.store.path_top , bottom_branch = temp_new_trail.store.path_bottom) == True:
-                        temp_new_trail = temp_new_trail.store.path_top
-
-                    else:
-                        temp_new_trail = temp_new_trail.store.path_bottom
-
-                elif mountain_list != None:
-                    stack.push(temp_new_trail.store.path_bottom)
+                
+                if personality.select_branch(top_branch = temp_new_trail.store.path_top , bottom_branch = temp_new_trail.store.path_bottom) == True:
                     temp_new_trail = temp_new_trail.store.path_top
 
+                else:
+                    temp_new_trail = temp_new_trail.store.path_bottom
+
         return
+    
+
+
+    def collect_mountains(self, mountain_list : list[Mountain]) -> None:
+        
+        if self.store != None:
+            if isinstance(self.store , TrailSeries):
+                mountain_list.append(self.store.mountain)
+                self.store.following.collect_mountains(mountain_list = mountain_list)
+
+            elif isinstance(self.store , TrailSplit):
+                self.store.path_top.collect_mountains(mountain_list = mountain_list)
+                self.store.path_bottom.collect_mountains(mountain_list = mountain_list)
+                self.store.path_follow.collect_mountains(mountain_list = mountain_list)
+
+        return
+    
+
+    
+    # def collect_mountain_list(self, list_index : int , mountain_list : list[list[Mountain]]) -> None:
+        
+        
+    #     if self.store != None:
+    #         if isinstance(self.store , TrailSeries):
+    #             mountain_list[list_index].append(self.store.mountain)
+    #             self.store.following.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
+
+
+    #         elif isinstance(self.store , TrailSplit):
+
+    #             print("list index is " , list_index)
+    #             print("length of mountain list is " , len(mountain_list))
+                
+
+    #             if len(mountain_list) <= list_index:
+    #                 mountain_list.insert(list_index, [])
+
+    #             temp_list_of_mountain : list[Mountain] = mountain_list[list_index]
+
+    #             self.store.path_top.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
+    #             self.store.path_follow.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
+
+    #             list_index += 1
+
+    #             mountain_list.insert(list_index , temp_list_of_mountain)
+
+    #             self.store.path_bottom.collect_mountain_list(list_index = list_index, mountain_list = mountain_list)
+    #             self.store.path_follow.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
+
+    #     return
+
+
+
 
 
 
