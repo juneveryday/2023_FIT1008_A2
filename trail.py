@@ -159,9 +159,6 @@ class Trail:
 
         self.collect_mountains(mountain_list = list_of_mountains)
 
-        print("list of mountains is " , list_of_mountains)
-        print("\nlength of list of mountains is " , len(list_of_mountains))
-
         return list_of_mountains
 
         
@@ -179,15 +176,17 @@ class Trail:
 
         list_of_mountains = self.collect_mountain_list()
 
-        print("length of list of list is " , len(list_of_mountains))
-        for i in range (len(list_of_mountains)):
+        print("\nlist of mountains outside loop " ,list_of_mountains , " \nand length is " , len(list_of_mountains))
 
-            print("\nlist of mountains at index " , i , " is " , list_of_mountains[i] , "\n")
 
+        for i in range (len(list_of_mountains) -1 , -1 , -1):
+            print("index is " , i)
             if len(list_of_mountains[i]) != k:
                 del list_of_mountains[i]
 
-        print("\nlist  of mountains is " , list_of_mountains , " with length " , len(list_of_mountains))
+        
+        print("list of mountains after del is " , list_of_mountains , " \nand length is " , len(list_of_mountains))
+
         return list_of_mountains
 
 
@@ -235,10 +234,8 @@ class Trail:
         if self.store != None:
             if isinstance(self.store , TrailSeries):
 
-                print("\nentering trailseries")
                 temp_mountain_list : list[list[Mountain]] = None
                 temp_mountain_list = [[self.store.mountain]]
-                print("\nentering recursion so before it mountain list of list is " , temp_mountain_list)
 
                 temp_list = self.store.following.collect_mountain_list()
                 
@@ -246,11 +243,9 @@ class Trail:
 
                     for list_index in range (len(temp_list)):
                         temp_list[list_index] = temp_mountain_list[0] + temp_list[list_index]
-
-                        print("\nfor index" , list_index , " temp list is " , temp_list[list_index])
                 
                     temp_mountain_list = temp_list
-                print("\nafter recursion mountain list of list is " , temp_mountain_list, "\n")
+
                 return temp_mountain_list
             
             elif isinstance(self.store , TrailSplit):
@@ -258,137 +253,63 @@ class Trail:
                 temp_bot_list : list[list[Mountain]]= [[]]
                 temp_fol_list : list[list[Mountain]]= [[]]
 
-                print("\nentering trailsplit")
-                print("recursively calling top")
+                
                 temp_list = self.store.path_top.collect_mountain_list()
 
                 if temp_list != None:
                     temp_top_list = temp_list
-                    print("\ntop list is " , temp_top_list, "\n")
 
 
-                print("recursively calling bottom")
                 temp_list = self.store.path_bottom.collect_mountain_list()
 
                 if temp_list != None:
                     temp_bot_list = temp_list
-                    print("\nbottom list is " , temp_bot_list, "\n")
 
 
-                print("recursively calling follow")
                 temp_fol_list = self.store.path_follow.collect_mountain_list()
 
-                temp_topfol_list : list[list] = None
-                temp_botfol_list : list[list] = None
+                # temp_topfol_list : list[list[Mountain]] = None
+                # temp_botfol_list : list[list[Mountain]] = None
 
                 if temp_fol_list != None:
-                    for list_index in range (len(temp_top_list)):
-                        for fol_index in range (len(temp_fol_list)):
-                            if temp_topfol_list != None:
-                                temp_topfol_list += [temp_top_list[list_index] + temp_fol_list[fol_index]]
-                            else:
-                                temp_topfol_list = [temp_top_list[list_index] + temp_fol_list[fol_index]]
+                    # for list_index in range (len(temp_top_list)):
+                    #     for fol_index in range (len(temp_fol_list)):
+                    #         if temp_topfol_list != None:
+                    #             temp_topfol_list += [temp_top_list[list_index] + temp_fol_list[fol_index]]
+                    #         else:
+                    #             temp_topfol_list = [temp_top_list[list_index] + temp_fol_list[fol_index]]
 
-                    temp_top_list = temp_topfol_list
+                    #temp_top_list = temp_topfol_list
 
-                    print("\ntop list with follow is " , temp_top_list, "\n")
+                    temp_top_list = self.combine_list(list1 = temp_top_list , list2 = temp_fol_list)
 
-                    for list_index in range (len(temp_bot_list)):
-                        for fol_index in range (len(temp_fol_list)):
-                            if temp_botfol_list != None:
-                                temp_botfol_list += [temp_bot_list[list_index] + temp_fol_list[fol_index]]
-                            else:
-                                temp_botfol_list = [temp_bot_list[list_index] + temp_fol_list[fol_index]]
+                    temp_bot_list = self.combine_list(list1 = temp_bot_list , list2 = temp_fol_list)
 
-                    temp_bot_list = temp_botfol_list
 
-                    print("\nbottom list with follow is " , temp_bot_list, "\n")
+
+                    # for list_index in range (len(temp_bot_list)):
+                    #     for fol_index in range (len(temp_fol_list)):
+                    #         if temp_botfol_list != None:
+                    #             temp_botfol_list += [temp_bot_list[list_index] + temp_fol_list[fol_index]]
+                    #         else:
+                    #             temp_botfol_list = [temp_bot_list[list_index] + temp_fol_list[fol_index]]
+
+                    # temp_bot_list = temp_botfol_list
+
 
                 return temp_top_list + temp_bot_list
+            
+    def combine_list(self, list1 : list[list[Mountain]] , list2 : list[list[Mountain]]) -> list[list[Mountain]]:
 
+        temp_list : list[list[Mountain]] = None
+        for list_index1 in range (len(list1)):
+            for list_index2 in range (len(list2)):
+                if temp_list != None:
+                    temp_list += [list1[list_index1] + list2[list_index2]]
+                else:
+                    temp_list = [list1[list_index1] + list2[list_index2]]
 
-
-
-
-
-
-
-
-
-
-
-
-               
-        # if self.store != None:
-        #     if isinstance(self.store , TrailSeries):
-        #         print("\nentering trailseries\n")
-        #         #mountain_list[list_index].append(self.store.mountain)
-        #         mountain_list[list_index] = [self.store.mountain] + mountain_list[list_index]
-        #         self.store.following.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
-
-
-        #     elif isinstance(self.store , TrailSplit):
-
-        #         print("\n\nentering trailsplit\n")
-        #         print("list index is " , list_index)
-        #         print("length of mountain list is " , len(mountain_list))
-                
-
-        #         if len(mountain_list) <= list_index:
-        #             mountain_list.insert(list_index, [])
-
-        #         temp_list_of_mountain : list[Mountain] = copy.deepcopy(mountain_list[list_index])
-
-        #         print("\ntemp list of mount is " , temp_list_of_mountain)
-        #         print("before follow list index is " , list_index , "\nMountain list[list index] is " , mountain_list[list_index])
-
-        #         self.store.path_follow.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
-        #         temp_list_of_mountain = mountain_list[list_index] + temp_list_of_mountain
-
-        #         print("\ntemp list of mount is " , temp_list_of_mountain)
-        #         print("after follow list index is " , list_index , "\nMountain list[list index] is " , mountain_list[list_index])
-
-        #         print("\ntemp list of mount is " , temp_list_of_mountain)
-        #         print("before top list index is " , list_index , "\nMountain list[list index] is " , mountain_list[list_index])
-
-        #         self.store.path_top.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
-
-                      
-        #         list_index += 1
-
-        #         if len(mountain_list) <= list_index:
-        #             mountain_list.insert(list_index, [])
-
-        #         #else:
-        #         # temp_list_of_mountain : list[Mountain] = mountain_list[list_index]
-        #         # mountain_list.insert(list_index , temp_list_of_mountain)
-
-                
-        #         mountain_list[list_index] = copy.deepcopy(temp_list_of_mountain)
-
-        #         print("\ntemp list of mount is " , temp_list_of_mountain)
-        #         print("before bottom list index is " , list_index , "\nMountain list[list index] is " , mountain_list[list_index])
-
-        #         self.store.path_bottom.collect_mountain_list(list_index = list_index, mountain_list = mountain_list)
-
-        #         print("\ntemp list of mount is " , temp_list_of_mountain)
-        #         print("after bottom list index is " , list_index , "\nMountain list[list index] is " , mountain_list[list_index])
-
-        #         self.store.path_follow.collect_mountain_list(list_index = list_index , mountain_list = mountain_list)
-
-        #         print("\ntemp list of mount is " , temp_list_of_mountain)
-        #         print("after follow after bottom list index is " , list_index , "\nMountain list[list index] is " , mountain_list[list_index])
-
-        # return
-
-
-
-
-
-
-
-
-
+        return temp_list
 
 
 

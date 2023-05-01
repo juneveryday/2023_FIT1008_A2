@@ -59,8 +59,13 @@ class TestTrailMethods(unittest.TestCase):
         self.load_example()
 
         # list1 = [["a"] , ["b"]]
-        # list2 = [[1] , [2]]
+        # list2 = [1 , 2 , 3 , 4]
+        # print("list is " , list2)
 
+        # for i in range (len(list2) -1 , -1 , -1):
+        #     del list2[i]
+        #     print("index is " , i , " after del " , list2)
+        
         # temp_list :list[list] = None
 
         # for i in range (len(list1)):
@@ -90,6 +95,7 @@ class TestTrailMethods(unittest.TestCase):
         self.assertEqual(len(res), 3) 
  
         res = self.trail.collect_all_mountains()
+        print ("\nfrom collect all mounts " ,res , " \nand length is " , len(res))
 
         hash_mountain = lambda m: m.name
 
