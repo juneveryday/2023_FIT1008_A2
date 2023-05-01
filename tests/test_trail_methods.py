@@ -13,33 +13,67 @@ class TestTrailMethods(unittest.TestCase):
         self.bot_one = Mountain("bot-one", 2, 5)
         self.bot_two = Mountain("bot-two", 0, 0)
         self.final   = Mountain("final", 4, 4)
+        self.trail = Trail(TrailSplit(
+            Trail(TrailSplit(
+                Trail(TrailSeries(self.top_top, Trail(None))),
+                Trail(TrailSeries(self.top_bot, Trail(None))),
+                Trail(TrailSeries(self.top_mid, Trail(None))),
+            )),
+            Trail(TrailSeries(self.bot_one, Trail(TrailSplit(
+                Trail(TrailSeries(self.bot_two, Trail(None))),
+                Trail(None),
+                Trail(None),
+            )))),
+            Trail(TrailSeries(self.final, Trail(None)))
+        ))
+
+
         # self.trail = Trail(TrailSplit(
-        #     Trail(TrailSplit(
-        #         Trail(TrailSeries(self.top_top, Trail(None))),
-        #         Trail(TrailSeries(self.top_bot, Trail(None))),
-        #         Trail(TrailSeries(self.top_mid, Trail(None))),
-        #     )),
-        #     Trail(TrailSeries(self.bot_one, Trail(TrailSplit(
+        #     Trail(TrailSeries(self.top_top, Trail(None))),
+        #     Trail(TrailSeries(self.top_bot, Trail(None))),
+        #     Trail(TrailSeries(self.top_mid, Trail((TrailSplit(
+        #         Trail(TrailSeries(self.bot_one, Trail(None))),
         #         Trail(TrailSeries(self.bot_two, Trail(None))),
-        #         Trail(None),
-        #         Trail(None),
-        #     )))),
-        #     Trail(TrailSeries(self.final, Trail(None)))
+        #         Trail(TrailSeries(self.final, Trail(None)))))),
+        # ))))
+
+
+
+        # self.trail = Trail(TrailSplit(
+        #     Trail(TrailSeries(self.top_top, Trail(None))),
+        #     Trail(TrailSeries(self.top_bot, Trail(None))),
+        #     Trail(TrailSeries(self.top_mid, Trail((TrailSeries(self.final, Trail(None)))))),
         # ))
 
-        self.trail = Trail(TrailSplit(
-            Trail(TrailSeries(self.top_top, Trail(None))),
-            Trail(TrailSeries(self.top_bot, Trail(None))),
-            Trail(TrailSeries(self.top_mid, Trail((TrailSeries(self.final, Trail(None)))))),
-        ))
+
+
+        # self.trail = Trail(TrailSeries(self.top_top , Trail(TrailSplit(Trail(TrailSeries(self.top_mid , Trail(None))) , Trail(TrailSeries(self.top_bot , Trail(None)))  , Trail(TrailSeries(self.bot_one , Trail(None)))  )  )))
+
+
+
+        # self.trail = Trail(TrailSeries(self.top_top , Trail(TrailSeries(self.top_mid , Trail(TrailSeries(self.final , Trail (TrailSeries(self.bot_one , Trail(None)))))))))
         
 
     @number("7.1")
     def test_example(self):
         self.load_example()
 
+        # list1 = [["a"] , ["b"]]
+        # list2 = [[1] , [2]]
+
+        # temp_list :list[list] = None
+
+        # for i in range (len(list1)):
+        #     for j in range (len(list2)):
+        #         if temp_list != None:
+        #             temp_list += [list1[i] + list2[j]]
+        #         else:
+        #             temp_list = [list1[i] + list2[j]]
+
+        # print("temp list is " ,temp_list)
+
         res = self.trail.length_k_paths(3)
-        """ make_path_string = lambda mountain_list: ", ".join(map(lambda x: x.name, mountain_list))
+        make_path_string = lambda mountain_list: ", ".join(map(lambda x: x.name, mountain_list))
         # This makes the result a list of strings, like so:
         # [
         #   "top-top, top-middle, final",
@@ -63,4 +97,4 @@ class TestTrailMethods(unittest.TestCase):
         self.assertSetEqual(set(map(hash_mountain, res)), set(map(hash_mountain, [
             self.top_bot, self.top_top, self.top_mid,
             self.bot_one, self.bot_two, self.final
-        ])))"""
+        ])))
