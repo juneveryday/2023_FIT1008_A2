@@ -119,80 +119,80 @@ class TestDoubleHash(unittest.TestCase):
         dt["Tom", "Jim"] = 7
         dt["Het", "Liz"] = 8
 
-        print(str(dt))
-        print ("all the outer are " , dt.keys())
+        # print(str(dt))
+        # print ("all the outer are " , dt.keys())
         key_iterator = dt.iter_keys()
         value_iterator = dt.iter_values()
 
         key = next(key_iterator)
-        print("outer keys are " , key)
+        #print("outer keys are " , key)
         #self.assertIn(key, ["May", "Kim"])
 
         self.assertIn(key, ["Tim", "Amy", "Tom", "Ivy", "Het"])
 
         key = next(key_iterator)
-        print ("outer keys are " , key)
+        #print ("outer keys are " , key)
         self.assertIn(key, ["Tim", "Amy", "Tom", "Ivy", "Het"])
 
         key = next(key_iterator)
-        print ("outer keys are " , key)
+        #print ("outer keys are " , key)
         self.assertIn(key, ["Tim", "Amy", "Tom", "Ivy", "Het"])
 
-        print ("all the keys of Tom are " , dt.keys("Tom"))
+        #print ("all the keys of Tom are " , dt.keys("Tom"))
 
 
         key_iterator1 = dt.iter_keys("Tom")
         key1 = next(key_iterator1)
-        print ("key with Tom is " , key1)
+        #print ("key with Tom is " , key1)
         self.assertIn(key1, ["Ben", "Tom", "Jim"])
 
         key1 = next(key_iterator1)
-        print ("key with Tom is " , key1)
+        #print ("key with Tom is " , key1)
         self.assertIn(key1, ["Ben", "Tom", "Jim"])
 
         key_iterator2 = dt.iter_keys("Tim")
 
-        print ("all the keys of Tim are " , dt.keys("Tim"))
+        #print ("all the keys of Tim are " , dt.keys("Tim"))
 
 
         key2 = next(key_iterator2)
-        print ("key with Tim is " ,key2)
+        #print ("key with Tim is " ,key2)
         self.assertIn(key2, ["Bob","Jen"])
 
         key2 = next(key_iterator2)
-        print ("key with Tim is " , key2)
+        #print ("key with Tim is " , key2)
         self.assertIn(key2, ["Bob","Jen"])
 
 
 
-        print("all the values are " , dt.values())
-        print("all Tom values are ", dt.values("Tom"))
-        print("all Tim values are ", dt.values("Tim"))
+        # print("all the values are " , dt.values())
+        # print("all Tom values are ", dt.values("Tom"))
+        # print("all Tim values are ", dt.values("Tim"))
 
         value = next(value_iterator)
-        print("all value after next is " , value)
+        #print("all value after next is " , value)
         self.assertIn(value, [1, 2, 3, 4, 5, 6, 7, 8])
 
         value = next(value_iterator)
-        print("all value after next is " , value)
+        #print("all value after next is " , value)
         self.assertIn(value, [1, 2, 3, 4, 5, 6, 7, 8])
 
         value_iterator1 = dt.iter_values("Tom")
         value1 = next(value_iterator1)
-        print ("after next values with Tom are " , value1)
+        #print ("after next values with Tom are " , value1)
         self.assertIn(value1, [3, 5, 7])
 
         value1 = next(value_iterator1)
-        print ("after next values with Tom are " , value1)
+        #print ("after next values with Tom are " , value1)
         self.assertIn(value1, [3, 5, 7])
 
         value_iterator2 = dt.iter_values("Tim")
         value2 = next(value_iterator2)
-        print ("after next values with Tim are " , value2)
+        #print ("after next values with Tim are " , value2)
         self.assertIn(value2, [1, 6])
 
         value2 = next(value_iterator2)
-        print ("after next values with Tim are " , value2)
+        #print ("after next values with Tim are " , value2)
         self.assertIn(value2, [1, 6])
 
 
@@ -204,14 +204,14 @@ class TestDoubleHash(unittest.TestCase):
         del dt["Tim", 'Jen']
         del dt["Ivy", "Jen"]
 
-        print ("after del is called")
-        print ("all the outer keys are " , dt.keys())
-        print ("all the keys of Tom are " , dt.keys("Tom"))
-        print ("all the keys of Tim are " , dt.keys("Tim"))
+        # print ("after del is called")
+        # print ("all the outer keys are " , dt.keys())
+        # print ("all the keys of Tom are " , dt.keys("Tom"))
+        # print ("all the keys of Tim are " , dt.keys("Tim"))
 
-        print ("all the values are " , dt.values())
-        print ("all the values of Tom are " , dt.values("Tom"))
-        print ("all the values of Tim are " , dt.values("Tim"))
+        # print ("all the values are " , dt.values())
+        # print ("all the values of Tom are " , dt.values("Tom"))
+        # print ("all the values of Tim are " , dt.values("Tim"))
 
 
         try:
@@ -219,12 +219,12 @@ class TestDoubleHash(unittest.TestCase):
         except StopIteration:
             print("Stop Iteration for key")
         else:
-            print ("key with Tom is " , key2)
+            #print ("key with Tom is " , key2)
             self.assertIn(key2, ["Ben", "Jen"])
         
 
         key = next(key_iterator)
-        print ("outer keys are " , key)
+        #print ("outer keys are " , key)
         self.assertIn(key, [ "Amy", "Tom", "Het"])
 
         try:
@@ -232,14 +232,14 @@ class TestDoubleHash(unittest.TestCase):
         except StopIteration:
             print("Stop Iteration for value")
         else:
-            print ("after next values with Tom are " , value2)
+           # print ("after next values with Tom are " , value2)
             self.assertIn(value2, [1, 6])
 
         value = next(value_iterator)
-        print("all value after next is " , value)
+        #print("all value after next is " , value)
         self.assertIn(value, [2, 3, 5, 7, 8])
 
-        print("after del\n" , str(dt))
+        #print("after del\n" , str(dt))
 
 
         del dt["Tom", "Ben"]
@@ -256,7 +256,7 @@ class TestDoubleHash(unittest.TestCase):
         except StopIteration:
             print("Stop Iteration for key")
         else:
-            print ("outer keys are " , key)
+            #print ("outer keys are " , key)
             self.assertIn(key, [])
 
         try:
@@ -264,7 +264,7 @@ class TestDoubleHash(unittest.TestCase):
         except StopIteration:
             print("Stop Iteration for value")
         else:
-            print ("all value are  " , value2)
+            #print ("all value are  " , value2)
             self.assertIn(value, [])
 
 

@@ -95,7 +95,6 @@ class TestTrailMethods(unittest.TestCase):
         self.assertEqual(len(res), 3) 
  
         res = self.trail.collect_all_mountains()
-        print ("\nfrom collect all mounts " ,res , " \nand length is " , len(res))
 
         hash_mountain = lambda m: m.name
 

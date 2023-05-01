@@ -71,6 +71,6 @@ class MountainManager:
     
             grouped_list_diff.append(grouped_list)
             
-        print("\nlol is" , grouped_list_diff)
+        #print("\nlol is" , grouped_list_diff)
         return grouped_list_diff
             

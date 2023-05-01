@@ -157,7 +157,7 @@ class Trail:
 
         list_of_mountains : list[Mountain] = []
 
-        self.collect_mountains(mountain_list = list_of_mountains)
+        list_of_mountains = self.collect_mountains()
 
         return list_of_mountains
 
@@ -176,16 +176,9 @@ class Trail:
 
         list_of_mountains = self.collect_mountain_list()
 
-        print("\nlist of mountains outside loop " ,list_of_mountains , " \nand length is " , len(list_of_mountains))
-
-
         for i in range (len(list_of_mountains) -1 , -1 , -1):
-            print("index is " , i)
             if len(list_of_mountains[i]) != k:
                 del list_of_mountains[i]
-
-        
-        print("list of mountains after del is " , list_of_mountains , " \nand length is " , len(list_of_mountains))
 
         return list_of_mountains
 
@@ -214,37 +207,40 @@ class Trail:
     
 
 
-    def collect_mountains(self, mountain_list : list[Mountain]) -> None:
+    def collect_mountains(self) -> list[Mountain]:
         
-        if self.store != None:
+        temp_mountain_list : list[Mountain] = []
+
+        if self.store == None:
+            return []
+        
+        else:
             if isinstance(self.store , TrailSeries):
-                mountain_list.append(self.store.mountain)
-                self.store.following.collect_mountains(mountain_list = mountain_list)
+                temp_mountain_list.append(self.store.mountain)
+                temp_mountain_list += self.store.following.collect_mountains()
 
             elif isinstance(self.store , TrailSplit):
-                self.store.path_top.collect_mountains(mountain_list = mountain_list)
-                self.store.path_bottom.collect_mountains(mountain_list = mountain_list)
-                self.store.path_follow.collect_mountains(mountain_list = mountain_list)
+                temp_mountain_list += self.store.path_top.collect_mountains()
+                temp_mountain_list += self.store.path_bottom.collect_mountains()
+                temp_mountain_list += self.store.path_follow.collect_mountains()
 
-        return
+            return temp_mountain_list
     
 
     
     def collect_mountain_list(self) -> list[list[Mountain]]:
-        if self.store != None:
+        if self.store == None:
+            return [[]]
+        
+        else:
             if isinstance(self.store , TrailSeries):
 
                 temp_mountain_list : list[list[Mountain]] = None
                 temp_mountain_list = [[self.store.mountain]]
 
                 temp_list = self.store.following.collect_mountain_list()
-                
-                if temp_list != None:
 
-                    for list_index in range (len(temp_list)):
-                        temp_list[list_index] = temp_mountain_list[0] + temp_list[list_index]
-                
-                    temp_mountain_list = temp_list
+                temp_mountain_list = self.combine_list(list1 = temp_mountain_list , list2 = temp_list)
 
                 return temp_mountain_list
             
@@ -253,51 +249,19 @@ class Trail:
                 temp_bot_list : list[list[Mountain]]= [[]]
                 temp_fol_list : list[list[Mountain]]= [[]]
 
-                
-                temp_list = self.store.path_top.collect_mountain_list()
+                temp_top_list = self.store.path_top.collect_mountain_list()
 
-                if temp_list != None:
-                    temp_top_list = temp_list
-
-
-                temp_list = self.store.path_bottom.collect_mountain_list()
-
-                if temp_list != None:
-                    temp_bot_list = temp_list
-
+                temp_bot_list = self.store.path_bottom.collect_mountain_list()
 
                 temp_fol_list = self.store.path_follow.collect_mountain_list()
 
-                # temp_topfol_list : list[list[Mountain]] = None
-                # temp_botfol_list : list[list[Mountain]] = None
+                temp_top_list = self.combine_list(list1 = temp_top_list , list2 = temp_fol_list)
 
-                if temp_fol_list != None:
-                    # for list_index in range (len(temp_top_list)):
-                    #     for fol_index in range (len(temp_fol_list)):
-                    #         if temp_topfol_list != None:
-                    #             temp_topfol_list += [temp_top_list[list_index] + temp_fol_list[fol_index]]
-                    #         else:
-                    #             temp_topfol_list = [temp_top_list[list_index] + temp_fol_list[fol_index]]
-
-                    #temp_top_list = temp_topfol_list
-
-                    temp_top_list = self.combine_list(list1 = temp_top_list , list2 = temp_fol_list)
-
-                    temp_bot_list = self.combine_list(list1 = temp_bot_list , list2 = temp_fol_list)
-
-
-
-                    # for list_index in range (len(temp_bot_list)):
-                    #     for fol_index in range (len(temp_fol_list)):
-                    #         if temp_botfol_list != None:
-                    #             temp_botfol_list += [temp_bot_list[list_index] + temp_fol_list[fol_index]]
-                    #         else:
-                    #             temp_botfol_list = [temp_bot_list[list_index] + temp_fol_list[fol_index]]
-
-                    # temp_bot_list = temp_botfol_list
-
+                temp_bot_list = self.combine_list(list1 = temp_bot_list , list2 = temp_fol_list)
 
                 return temp_top_list + temp_bot_list
+            
+
             
     def combine_list(self, list1 : list[list[Mountain]] , list2 : list[list[Mountain]]) -> list[list[Mountain]]:
 

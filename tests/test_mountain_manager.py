@@ -26,7 +26,7 @@ class TestInfiniteHash(unittest.TestCase):
         mm.add_mountain(m3)
         mm.add_mountain(m1)
 
-        print("sorted order is\n " ,mm.mountain_list)
+        #print("sorted order is\n " ,mm.mountain_list)
 
         def make_set(my_list):
             

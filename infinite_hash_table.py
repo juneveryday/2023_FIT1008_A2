@@ -56,7 +56,7 @@ class InfiniteHashTable(Generic[K, V]):
                 raise KeyError("key ", key ," does not exist")
 
             elif isinstance(outer_array[index_position][1], int):
-                print("Value for key ", key, " is " , outer_array[index_position][1])
+                #print("Value for key ", key, " is " , outer_array[index_position][1])
                 return outer_array[index_position][1]
 
             else:
@@ -145,8 +145,8 @@ class InfiniteHashTable(Generic[K, V]):
         list_array : list[ArrayR] = []
         list_array.insert(0 , self.top_level_table)
 
-        print("delete function ", key)
-        print("index list is " , index_list , "length is ", len(index_list))
+        # print("delete function ", key)
+        # print("index list is " , index_list , "length is ", len(index_list))
         
         for key_index in range(len(index_list)):
             if key_index < (len(index_list) - 1):        
@@ -154,7 +154,7 @@ class InfiniteHashTable(Generic[K, V]):
                 
 
         current_array = list_array[-1]
-        print("tuple to delete is " , current_array[index_list[-1]])
+        #print("tuple to delete is " , current_array[index_list[-1]])
         current_array[index_list[-1]] = None
         self.count -= 1
 
@@ -176,7 +176,7 @@ class InfiniteHashTable(Generic[K, V]):
 
                     list_of_items.append(current_array[i])
 
-            print("list of items " , list_of_items)
+            #print("list of items " , list_of_items)
 
 
             if len(list_of_items) == 1:
@@ -185,9 +185,9 @@ class InfiniteHashTable(Generic[K, V]):
                 else:
                     outer_array[index_list[array_index - 1]] = list_of_items[0]
 
-            for i in range (len(outer_array)):
-                if outer_array[i] != None:
-                    print("index " , i , " outer array is " , outer_array[i])
+            # for i in range (len(outer_array)):
+            #     if outer_array[i] != None:
+            #         print("index " , i , " outer array is " , outer_array[i])
 
         
 
@@ -229,7 +229,7 @@ class InfiniteHashTable(Generic[K, V]):
         :raises KeyError: when the key doesn't exist.
         """
 
-        print("\ninside get location with key " , key , "\n")
+        #print("\ninside get location with key " , key , "\n")
         self.level = 0
         outer_array = self.top_level_table
         index_list : list[int] = []
@@ -238,13 +238,13 @@ class InfiniteHashTable(Generic[K, V]):
             index_position = self.hash(key = key)
             
             if outer_array[index_position] == None or (outer_array[index_position][0] != key and not isinstance(outer_array[index_position][1], ArrayR)):
-                print("key not found ", key)
+                #print("key not found ", key)
                 raise KeyError("key ", key ," does not exist")
             
 
             elif isinstance(outer_array[index_position][1], int):
                 index_list.append(index_position)
-                print("\nlist has " , index_list, " for key ", key)
+                #print("\nlist has " , index_list, " for key ", key)
                 return index_list
 
             else:
