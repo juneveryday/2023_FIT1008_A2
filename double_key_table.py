@@ -84,7 +84,11 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                     self.outer_hash_table[outer_position] = (key1, internal_hash_table)
                     self.outer_count += 1
 
-                    inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
+                    if key2 == None:
+                        inner_position = -1
+                    else:
+                        inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
+                        
                     return (outer_position, inner_position)
 
                 raise KeyError(key1) #else if is_insert is false
@@ -197,8 +201,8 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key2 = key[1]
 
         outer_index, inner_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
-        inner_table = self.outer_hash_table[outer_index][1]
-        return inner_table[inner_index][1]
+        inner_table : LinearProbeTable[K2,V] = self.outer_hash_table[outer_index][1]
+        return inner_table[key2]
 
 
     def __setitem__(self, key: tuple[K1, K2], data: V) -> None:
@@ -281,7 +285,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             if item != None:
                 key1_new, value = item
 
-                new_outer_index, new_inner_index = self._linear_probe(key1_new, key1_new, True)
+                new_outer_index, new_inner_index = self._linear_probe(key1_new, None, True)
                 self.outer_hash_table[new_outer_index] = (key1_new, value)
                 
 

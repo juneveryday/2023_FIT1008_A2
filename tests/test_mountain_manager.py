@@ -1,6 +1,7 @@
 import unittest
 from ed_utils.decorators import number
 
+from copy import copy
 from mountain import Mountain
 from mountain_manager import MountainManager
 
@@ -28,13 +29,27 @@ class TestInfiniteHash(unittest.TestCase):
 
         #print("sorted order is\n " ,mm.mountain_list)
 
+        # def make_set(my_list):
+            
+        #     """
+        #     Since mountains are unhashable, add a method to get a set of all mountain ids.
+        #     Ensures that we can compare two lists without caring about order."""
+            
+        #     return set(id(x) for x in my_list)
+
         def make_set(my_list):
             
             """
             Since mountains are unhashable, add a method to get a set of all mountain ids.
             Ensures that we can compare two lists without caring about order."""
             
-            return set(id(x) for x in my_list)
+            return set(x.name for x in my_list)
+
+        set1 = make_set(mm.mountains_with_difficulty(3))
+        set2 = make_set([m3])
+
+        print("\nset 1 is " , set1)
+        print("\nset 2 is " , set2)
 
         self.assertEqual(make_set(mm.mountains_with_difficulty(3)), make_set([m3]))
         self.assertEqual(make_set(mm.mountains_with_difficulty(4)), make_set([]))
@@ -59,6 +74,26 @@ class TestInfiniteHash(unittest.TestCase):
         # mm.remove_mountain(m5)
 
         #print("remvomed mountain m5\n " ,mm.mountain_list)
+
+
+        mm.add_mountain(m10)
+
+        mount_diff_7 = mm.mountains_with_difficulty(7)
+        print("mount 7: " , mount_diff_7)
+
+        temp_mount = mount_diff_7[1]
+        print("temp mount is " , temp_mount)
+
+        print("\nall mounts are ", mm.mountain_list)
+
+        temp_mount.name = "wes"
+        print("\ntemp mount is " , temp_mount)
+
+        print("mount 7: " , mount_diff_7)
+
+        print("\nall mounts are ", mm.mountain_list)
+
+
 
         mm.edit_mountain(m5 , m10)
 

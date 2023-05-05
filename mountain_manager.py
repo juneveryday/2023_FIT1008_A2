@@ -1,6 +1,8 @@
 from mountain import Mountain
 from algorithms.binary_search import binary_search
 
+import copy
+
 class MountainManager:
 
     def __init__(self) -> None:
@@ -10,9 +12,11 @@ class MountainManager:
 
 
     def add_mountain(self, mountain: Mountain) -> None:
-        mountain_index = binary_search(l = self.mountain_list, item = mountain, key = lambda x : (x.difficulty_level, x.name), is_insert = True)
+        copy_mountain = copy.deepcopy(mountain)
+        # copy_mountain = mountain
+        mountain_index = binary_search(l = self.mountain_list, item = copy_mountain, key = lambda x : (x.difficulty_level, x.name), is_insert = True)
         #print("index is " , mountain_index , "mountain is ", mountain)
-        self.mountain_list.insert(mountain_index , mountain)
+        self.mountain_list.insert(mountain_index , copy_mountain)
 
 
 
@@ -34,9 +38,10 @@ class MountainManager:
 
         for diff_index in range(len(self.mountain_list)):
             if self.mountain_list[diff_index].difficulty_level == diff:
-                same_diff_mountain.append(self.mountain_list[diff_index])
+                temp_mountain = copy.deepcopy(self.mountain_list[diff_index])
+                same_diff_mountain.append(temp_mountain)
 
-        #print("mount with same diff" ,diff , " are " , same_diff_mountain)
+        # print("mount with same diff" ,diff , " are " , same_diff_mountain)
         return same_diff_mountain
 
         
@@ -68,7 +73,7 @@ class MountainManager:
             
             grouped_list : list[Mountain] = self.mountains_with_difficulty(self.mountain_list[index_diff].difficulty_level)
             index_diff += len(grouped_list)
-    
+
             grouped_list_diff.append(grouped_list)
             
         #print("\nlol is" , grouped_list_diff)
