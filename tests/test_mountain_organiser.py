@@ -22,6 +22,8 @@ class TestInfiniteHash(unittest.TestCase):
         mo = MountainOrganiser()
         mo.add_mountains([m2, m1])
 
+        # print("list is " , mo.sorted_mountain_list)
+
         self.assertEqual([mo.cur_position(m) for m in [m1, m2]], [0, 1])
         mo.add_mountains([m4, m3])
         self.assertEqual([mo.cur_position(m) for m in [m1, m2, m3, m4]], [1, 3, 2, 0])
@@ -29,6 +31,8 @@ class TestInfiniteHash(unittest.TestCase):
         self.assertEqual([mo.cur_position(m) for m in [m1, m2, m3, m4, m9]], [1, 4, 2, 0, 3])
         mo.add_mountains([m7, m5, m6, m8])
         self.assertEqual([mo.cur_position(m) for m in [m1, m2, m3, m4, m5, m6, m7, m8, m9]], [1, 8, 3, 0, 4, 2, 6, 7, 5])
+
+        # print("list is " , mo.sorted_mountain_list)
         
         self.assertRaises(KeyError, lambda: mo.cur_position(m10)) 
   

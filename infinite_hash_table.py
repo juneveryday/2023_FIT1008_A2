@@ -23,9 +23,6 @@ class InfiniteHashTable(Generic[K, V]):
 
     def __init__(self) -> None:
 
-        # if sizes is not None:
-        #     self.TABLE_SIZE = sizes
-
         self.top_level_table : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
         self.level = 0
         self.count = 0
@@ -55,8 +52,7 @@ class InfiniteHashTable(Generic[K, V]):
             if outer_array[index_position] == None:
                 raise KeyError("key ", key ," does not exist")
 
-            elif isinstance(outer_array[index_position][1], int):
-                #print("Value for key ", key, " is " , outer_array[index_position][1])
+            elif not isinstance(outer_array[index_position][1], ArrayR):
                 return outer_array[index_position][1]
 
             else:
@@ -73,63 +69,35 @@ class InfiniteHashTable(Generic[K, V]):
         
         while True:
             index_position = self.hash(key = key)
-            #print("index position of input key is " , key ,index_position)
             
             if outer_array[index_position] == None:
                 outer_array[index_position] = (key,value)
                 self.count += 1
-
-                # for i in range (len(outer_array)):
-                #     if outer_array[i] != None:
-                #         print("outer array at index " , i , " is " , outer_array[i])
-                
                 return
 
             elif outer_array[index_position][0] == key:
                 outer_array[index_position] = (key,value)
-
-                # for i in range (len(outer_array)):
-                #     if outer_array[i] != None:
-                #         print("outer array at index " , i , " is " , outer_array[i])
-
                 return
 
-            elif isinstance(outer_array[index_position][1] , int):
+            elif not isinstance(outer_array[index_position][1] , ArrayR):
                 outer_key , outer_value = outer_array[index_position]
-                #print("outer key and value is " , outer_key , outer_value , "at index " , index_position)
 
                 inner_array : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
                 outer_array[index_position] = (key[0 : self.level + 1], inner_array)
-
-                #print("new key and value is " , outer_array[index_position])
                 
                 self.level += 1
 
-                #print("new level is " , self.level)
                 outer_array = inner_array
                 
                 index_position = self.hash(key = outer_key)                   
                 outer_array[index_position] = (outer_key , outer_value)
 
-                #print("index position for original key is" , outer_key , index_position)
-
-
             else: 
                 outer_key , outer_value = outer_array[index_position]
-                #print("outer key and value is " , outer_key , outer_value , "at index " , index_position)
-
-                inner_array = outer_value
-
-                #print("outer key " , outer_key )
-
-                # for i in range (len(inner_array)):
-                #         if inner_array[i] != None:
-                #             print("inner array at index " , i , " is " , inner_array[i])
-
+                
                 self.level += 1
-                #print("next level is " , self.level)
 
-                outer_array = inner_array
+                outer_array = outer_value
 
 
 
@@ -229,7 +197,6 @@ class InfiniteHashTable(Generic[K, V]):
         :raises KeyError: when the key doesn't exist.
         """
 
-        #print("\ninside get location with key " , key , "\n")
         self.level = 0
         outer_array = self.top_level_table
         index_list : list[int] = []
@@ -238,13 +205,10 @@ class InfiniteHashTable(Generic[K, V]):
             index_position = self.hash(key = key)
             
             if outer_array[index_position] == None or (outer_array[index_position][0] != key and not isinstance(outer_array[index_position][1], ArrayR)):
-                #print("key not found ", key)
                 raise KeyError("key ", key ," does not exist")
             
-
-            elif isinstance(outer_array[index_position][1], int):
+            elif not isinstance(outer_array[index_position][1], ArrayR):
                 index_list.append(index_position)
-                #print("\nlist has " , index_list, " for key ", key)
                 return index_list
 
             else:

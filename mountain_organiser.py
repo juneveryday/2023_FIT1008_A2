@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from mountain import Mountain
 from data_structures.hash_table import LinearProbeTable
-from algorithms.mergesort import mergesort
+from algorithms.mergesort import mergesort , merge
 from algorithms.binary_search import binary_search
 
 class MountainOrganiser:
 
     def __init__(self) -> None:
-
         self.sorted_mountain_list : list[Mountain] = []
 
 
@@ -18,6 +17,7 @@ class MountainOrganiser:
 
 
     def add_mountains(self, mountains: list[Mountain]) -> None:
-        self.sorted_mountain_list = mergesort(l = self.sorted_mountain_list + mountains, key = lambda a : (a.length , a.name))
+        temp_sort = mergesort(l = mountains, key = lambda a : (a.length , a.name))
+        self.sorted_mountain_list = merge(l1 = temp_sort , l2 = self.sorted_mountain_list , key = lambda a : (a.length , a.name))
  
         

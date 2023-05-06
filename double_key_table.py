@@ -75,20 +75,18 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
 
         outer_position = self.hash1(key1)
+        inner_position = -1
 
         for _ in range(self.table_size):
             if self.outer_hash_table[outer_position] is None:
                 if is_insert:
-                    internal_hash_table =  LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
-                    internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table)
-                    self.outer_hash_table[outer_position] = (key1, internal_hash_table)
-                    self.outer_count += 1
-
-                    if key2 == None:
-                        inner_position = -1
-                    else:
+                    if key2 != None:
+                        internal_hash_table : LinearProbeTable[K2 , V] =  LinearProbeTable(sizes = self.INTERNAL_TABLE_SIZES)
+                        internal_hash_table.hash = lambda k: self.hash2(k, internal_hash_table)
+                        self.outer_hash_table[outer_position] = (key1, internal_hash_table)  
                         inner_position = internal_hash_table._linear_probe(key = key2 , is_insert = is_insert)
-                        
+
+                    self.outer_count += 1    
                     return (outer_position, inner_position)
 
                 raise KeyError(key1) #else if is_insert is false
@@ -116,17 +114,16 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             Returns an iterator of all keys in the bottom-hash-table for k.
         """
 
-        k_iter = KeyIterator(outer_table = self, key = key)
-        return k_iter
+        return KeyIterator(outer_table = self, key = key) 
 
 
-    def keys(self, key:K1|None=None) -> list[K1]:
+    def keys(self, key:K1|None=None) -> list[K1|K2]:
         """
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
 
-        key_list = []
+        key_list : list[K1|K2] = []
         
         for item in self.outer_hash_table:
             if item != None:
@@ -150,8 +147,8 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             Returns an iterator of all values in the bottom-hash-table for k.
         """
 
-        v_iter = ValueIterator(outer_table = self, key = key)
-        return v_iter
+        return ValueIterator(outer_table = self, key = key)
+        
         
 
     def values(self, key:K1|None=None) -> list[V]:
@@ -160,7 +157,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = x: returns all values for top-level key x.
         """
         
-        value_list = []
+        value_list : list[V] = []
 
         for item in self.outer_hash_table:
             if item != None: 
@@ -171,10 +168,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                     else:
                         continue
                 else:
-                    temp_list = inner_table_item.values()
-
-                    for i in temp_list:
-                        value_list.append(i)
+                    value_list.extend(inner_table_item.values())
                     
         return value_list
 
@@ -197,12 +191,9 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         :raises KeyError: when the key doesn't exist.
         """
 
-        key1 = key[0]
-        key2 = key[1]
-
-        outer_index, inner_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
+        outer_index, inner_index = self._linear_probe(key1 = key[0], key2 = key[1], is_insert = False)
         inner_table : LinearProbeTable[K2,V] = self.outer_hash_table[outer_index][1]
-        return inner_table[key2]
+        return inner_table[key[1]]
 
 
     def __setitem__(self, key: tuple[K1, K2], data: V) -> None:
@@ -210,13 +201,10 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         Set an (key, value) pair in our hash table.
         """
 
-        key1 = key[0]
-        key2 = key[1]
+        outer_index, inner_index = self._linear_probe(key1 = key[0], key2 = key[1], is_insert = True)
 
-        outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = True)
-
-        inner_table = self.outer_hash_table[outer_key1_index][1]
-        inner_table[key2] = data
+        inner_table = self.outer_hash_table[outer_index][1]
+        inner_table[key[1]] = data
 
         if len(self) > self.table_size / 2:
             self._rehash()
@@ -228,39 +216,28 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         Deletes a (key, value) pair in our hash table.
         :raises KeyError: when the key doesn't exist.
         """
-        key1 = key[0]
-        key2 = key[1]
-
-        outer_key1_index, inner_key2_index = self._linear_probe(key1 = key1, key2 = key2, is_insert = False)
-
-        inner_table = self.outer_hash_table[outer_key1_index][1]
-
-        """ if len(self.key_list) != 0:
-            self.key_list.remove(key1)
-            # key 2 not removed
         
-        # doesnt take values and doesnt store index key
-        if len(self.value_list) != 0:
-            self.value_list.remove(inner_table[key2])
-            # key 2 not removed """
+        outer_index, inner_index = self._linear_probe(key1 = key[0], key2 = key[1], is_insert = False)
 
-        del inner_table[key2]
+        inner_table = self.outer_hash_table[outer_index][1]
+
+        del inner_table[key[1]]
 
         if len(inner_table) == 0:
-            self.outer_hash_table[outer_key1_index] = None
+            self.outer_hash_table[outer_index] = None
             self.outer_count -= 1
 
             # Start moving over the cluster
-            outer_key1_index = (outer_key1_index + 1) % self.table_size
+            outer_index = (outer_index + 1) % self.table_size
 
-            while self.outer_hash_table[outer_key1_index] is not None:
-                key1_new, value = self.outer_hash_table[outer_key1_index]
-                self.outer_hash_table[outer_key1_index] = None
+            while self.outer_hash_table[outer_index] is not None:
+                key1_new, value = self.outer_hash_table[outer_index]
+                self.outer_hash_table[outer_index] = None
 
                 # Reinsert.
-                new_outer_index, new_inner_index = self._linear_probe(key1_new, key2, True)
+                new_outer_index, new_inner_index = self._linear_probe(key1 = key1_new, key2 = None, is_insert = True)
                 self.outer_hash_table[new_outer_index] = (key1_new, value)
-                outer_key1_index = (outer_key1_index + 1) % self.table_size
+                outer_index = (outer_index + 1) % self.table_size
 
     
 
@@ -283,10 +260,10 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         for item in old_outer_hash_table:
             if item != None:
-                key1_new, value = item
+                key, value = item
 
-                new_outer_index, new_inner_index = self._linear_probe(key1_new, None, True)
-                self.outer_hash_table[new_outer_index] = (key1_new, value)
+                new_outer_index, new_inner_index = self._linear_probe(key1 = key, key2 = None, is_insert = True)
+                self.outer_hash_table[new_outer_index] = (key, value)
                 
 
 
@@ -315,11 +292,6 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         for item_outer in self.outer_hash_table:
             if item_outer is not None:
                 (key_outer, inner_table) = item_outer
-
-                """ for item_inner in inner_table.array:
-                    if item_inner is not None:
-                        (key_inner , value) = item_inner
-                        result += "(" + str(key_inner) + "," + str(value) + ")\n" """
                 
                 result += str(key_outer) + ":\n" + str(inner_table)
                 result += "\n"

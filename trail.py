@@ -137,7 +137,7 @@ class Trail:
     def follow_path(self, personality: WalkerPersonality) -> None:
         """Follow a path and add mountains according to a personality."""
 
-        temp_stack_follow = LinkedStack()
+        temp_stack_follow : LinkedStack[Trail] = LinkedStack()
         temp_new_trail : Trail = self
 
         temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality)
@@ -155,11 +155,23 @@ class Trail:
     def collect_all_mountains(self) -> list[Mountain]:
         """Returns a list of all mountains on the trail."""
 
-        list_of_mountains : list[Mountain] = []
 
-        list_of_mountains = self.collect_mountains()
+        temp_mountain_list : list[Mountain] = []
 
-        return list_of_mountains
+        if self.store == None:
+            return []
+        
+        else:
+            if isinstance(self.store , TrailSeries):
+                temp_mountain_list.append(self.store.mountain)
+                temp_mountain_list += self.store.following.collect_all_mountains()
+
+            elif isinstance(self.store , TrailSplit):
+                temp_mountain_list += self.store.path_top.collect_all_mountains()
+                temp_mountain_list += self.store.path_bottom.collect_all_mountains()
+                temp_mountain_list += self.store.path_follow.collect_all_mountains()
+
+            return temp_mountain_list
 
         
 
@@ -206,27 +218,6 @@ class Trail:
         return
     
 
-
-    def collect_mountains(self) -> list[Mountain]:
-        
-        temp_mountain_list : list[Mountain] = []
-
-        if self.store == None:
-            return []
-        
-        else:
-            if isinstance(self.store , TrailSeries):
-                temp_mountain_list.append(self.store.mountain)
-                temp_mountain_list += self.store.following.collect_mountains()
-
-            elif isinstance(self.store , TrailSplit):
-                temp_mountain_list += self.store.path_top.collect_mountains()
-                temp_mountain_list += self.store.path_bottom.collect_mountains()
-                temp_mountain_list += self.store.path_follow.collect_mountains()
-
-            return temp_mountain_list
-    
-
     
     def collect_mountain_list(self) -> list[list[Mountain]]:
         if self.store == None:
@@ -245,15 +236,12 @@ class Trail:
                 return temp_mountain_list
             
             elif isinstance(self.store , TrailSplit):
-                temp_top_list : list[list[Mountain]]= [[]]
-                temp_bot_list : list[list[Mountain]]= [[]]
-                temp_fol_list : list[list[Mountain]]= [[]]
 
-                temp_top_list = self.store.path_top.collect_mountain_list()
+                temp_top_list : list[list[Mountain]] = self.store.path_top.collect_mountain_list()
 
-                temp_bot_list = self.store.path_bottom.collect_mountain_list()
+                temp_bot_list : list[list[Mountain]] = self.store.path_bottom.collect_mountain_list()
 
-                temp_fol_list = self.store.path_follow.collect_mountain_list()
+                temp_fol_list : list[list[Mountain]] = self.store.path_follow.collect_mountain_list()
 
                 temp_top_list = self.combine_list(list1 = temp_top_list , list2 = temp_fol_list)
 

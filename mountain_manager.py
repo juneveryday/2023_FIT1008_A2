@@ -1,29 +1,29 @@
 from mountain import Mountain
 from algorithms.binary_search import binary_search
+from double_key_table import DoubleKeyTable
 
 import copy
 
 class MountainManager:
 
     def __init__(self) -> None:
-        self.mountain_list : list[Mountain] = []
-
+        self.mountain_table : DoubleKeyTable[int , str , Mountain] = DoubleKeyTable()
+        self.mountain_table.hash1 = lambda k: (k % self.mountain_table.table_size)
 
 
 
     def add_mountain(self, mountain: Mountain) -> None:
-        copy_mountain = copy.deepcopy(mountain)
-        # copy_mountain = mountain
-        mountain_index = binary_search(l = self.mountain_list, item = copy_mountain, key = lambda x : (x.difficulty_level, x.name), is_insert = True)
-        #print("index is " , mountain_index , "mountain is ", mountain)
-        self.mountain_list.insert(mountain_index , copy_mountain)
-
+        self.mountain_table[mountain.difficulty_level , mountain.name] = mountain
+        
 
 
     def remove_mountain(self, mountain: Mountain) -> None:
-        mountain_index = binary_search(l = self.mountain_list, item = mountain, key = lambda x : (x.difficulty_level, x.name))
-        #print("index is " , mountain_index , "mountain is ", mountain)
-        del self.mountain_list[mountain_index]
+        try:
+            del self.mountain_table[mountain.difficulty_level , mountain.name]
+        except KeyError:
+            return
+        else:
+            return
 
         
 
@@ -34,48 +34,27 @@ class MountainManager:
 
     
     def mountains_with_difficulty(self, diff: int) -> list[Mountain]:
-        same_diff_mountain : list[Mountain] = []
-
-        for diff_index in range(len(self.mountain_list)):
-            if self.mountain_list[diff_index].difficulty_level == diff:
-                temp_mountain = copy.deepcopy(self.mountain_list[diff_index])
-                same_diff_mountain.append(temp_mountain)
-
-        # print("mount with same diff" ,diff , " are " , same_diff_mountain)
+        same_diff_mountain : list[Mountain] = self.mountain_table.values(diff)
         return same_diff_mountain
 
-        
+          
 
     def group_by_difficulty(self) -> list[list[Mountain]]:
 
-        """ index_diff = 0
         grouped_list_diff : list[list[Mountain]] = []
+        all_diff_iter = self.mountain_table.iter_keys(None)
 
-        while (index_diff < len(self.mountain_list)):
-            
-            grouped_list : list[Mountain] = []
-        
-            while True:
-                grouped_list.append(self.mountain_list[index_diff])
-                index_diff += 1
-
-                if index_diff >= len(self.mountain_list) or self.mountain_list[index_diff - 1].difficulty_level != self.mountain_list[index_diff].difficulty_level:
-                    break
+        while True:
+            try:
+                key = next(all_diff_iter)
                 
-            grouped_list_diff.append(grouped_list)
-
-        return grouped_list_diff """
-
-        index_diff = 0
-        grouped_list_diff : list[list[Mountain]] = []
-
-        while (index_diff < len(self.mountain_list)):
+            except StopIteration:
+                break
             
-            grouped_list : list[Mountain] = self.mountains_with_difficulty(self.mountain_list[index_diff].difficulty_level)
-            index_diff += len(grouped_list)
+            else:
+                mount_value = self.mountain_table.values(key = key)
+                grouped_list_diff.append(mount_value)
 
-            grouped_list_diff.append(grouped_list)
-            
-        #print("\nlol is" , grouped_list_diff)
         return grouped_list_diff
-            
+
+        
