@@ -117,42 +117,6 @@ class InfiniteHashTable(Generic[K, V]):
             else:
                 return
 
-        
-
-    def __len__(self) -> int:
-        return self.count
-
-
-    def __str__(self) -> str:
-        """
-        String representation.
-
-        Not required but may be a good testing tool.
-        """
-        # result = ""
-        # current_array = self.top_level_table
-        # self.level = 0
-
-        # for array_index in range (len(current_array)):
-        #     if current_array[array_index] != None:
-        #         current_key, current_value = current_array[array_index]
-        #         if not isinstance(current_value , ArrayR):
-        #             result += str(self.level) + ":\n" + str(current_key) + " , " + str(current_value)
-        #         else:
-        #             current_array = current_value
-        #             self.level += 1
-
-        #         """ for item_inner in inner_table.array:
-        #             if item_inner is not None:
-        #                 (key_inner , value) = item_inner
-        #                 result += "(" + str(key_inner) + "," + str(value) + ")\n" """
-                
-        #         result += "\n"
-
-        # return result
-        raise NotImplementedError
-
-
 
     def get_location(self, key : K) -> list[int]:
         """
@@ -205,4 +169,46 @@ class InfiniteHashTable(Generic[K, V]):
                 array_stack.push(item = outer_array)
                 outer_array = outer_array[index_position][1]
                 self.level += 1
+
+
+    def __len__(self) -> int:
+        return self.count
+
+
+    def __str__(self) -> str:
+        """
+        String representation.
+
+        Not required but may be a good testing tool.
+        """
+        result = ""
+        temp_stack : LinkedStack[ArrayR] = LinkedStack()
+        current_array : ArrayR = self.top_level_table
+        outer_string = self.array_traversal(current_array = current_array , stack = temp_stack)
+        result += outer_string
+
+        while not temp_stack.is_empty():
+            current_array = temp_stack.pop()
+            inner_string = self.array_traversal(current_array = current_array , stack = temp_stack)
+
+            result += inner_string 
+
+        return result
+
+
+    def array_traversal(self , current_array : ArrayR , stack : LinkedStack[ArrayR]) -> str:
+        result = ""
+    
+        for array_index in range (len(current_array)):
+            if current_array[array_index] != None:
+                current_key, current_value = current_array[array_index]
+                if isinstance(current_value , ArrayR):
+                    stack.push(current_value)
+                
+                else:
+                    result += str(current_key) + " , " + str(current_value) + "\n"
+
+        return result
+
+
 
