@@ -31,6 +31,17 @@ class TestInfiniteHash(unittest.TestCase):
         self.assertEqual(ih.get_location("linger"), [4, 1, 6, 25])
         self.assertEqual(len(ih), 8)
 
+        # print("gl for linked is" , ih.get_location("linked"))
+        value1 = ih["lin"]
+        value2 = ih["limp"]
+        value3 = ih["mining"]
+
+        # print("getitem for lin is " , value1)
+        # print("getitem for limp is " , value2)
+        # print("getitem for minimg is " , value3)
+
+        self.assertRaises(KeyError, lambda: ih["mimi"])
+
     @number("4.2")
     def test_delete(self):
         ih = InfiniteHashTable()

@@ -27,7 +27,7 @@ class TestInfiniteHash(unittest.TestCase):
         mm.add_mountain(m3)
         mm.add_mountain(m1)
 
-        print("sorted order is\n " ,mm.mountain_table)
+        # print("sorted order is\n " ,mm.mountain_table)
 
         def make_set(my_list):
             
@@ -61,7 +61,7 @@ class TestInfiniteHash(unittest.TestCase):
         mm.add_mountain(m9)
 
         res = mm.group_by_difficulty()
-        print("\nlol is " , res)
+        # print("\nlol is " , res)
         self.assertEqual(len(res), 5)
         self.assertEqual(make_set(res[0]), make_set([m1, m2]))
         self.assertEqual(make_set(res[1]), make_set([m3, m4]))
@@ -80,27 +80,27 @@ class TestInfiniteHash(unittest.TestCase):
 
         mm.add_mountain(m10)
 
-        mount_diff_7 = mm.mountains_with_difficulty(7)
-        print("mount 7: " , mount_diff_7)
+        # mount_diff_7 = mm.mountains_with_difficulty(7)
+        # print("mount 7: " , mount_diff_7)
 
-        temp_mount = mount_diff_7[1]
-        print("temp mount is " , temp_mount)
+        # temp_mount = mount_diff_7[1]
+        # print("temp mount is " , temp_mount)
 
-        print("\nall mounts are ", mm.mountain_table)
+        # print("\nall mounts are ", mm.mountain_table)
 
-        temp_mount.name = "wes"
-        print("\ntemp mount is " , temp_mount)
+        # temp_mount.name = "wes"
+        # print("\ntemp mount is " , temp_mount)
 
-        print("mount 7: " , mount_diff_7)
+        # print("mount 7: " , mount_diff_7)
 
-        print("\nall mounts are ", mm.mountain_table)
+        # print("\nall mounts are ", mm.mountain_table)
 
 
         mm.edit_mountain(m5 , m10)
         mm.edit_mountain(m5 , m10)
 
         res = mm.group_by_difficulty()
-        print("\nlol is " , res)
+        # print("\nlol is " , res)
         self.assertEqual(len(res), 5)
 
         self.assertEqual(make_set(res[3]), make_set([m10])) 

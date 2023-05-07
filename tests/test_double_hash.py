@@ -217,7 +217,8 @@ class TestDoubleHash(unittest.TestCase):
         try:
             key2 = next(key_iterator2)
         except StopIteration:
-            print("Stop Iteration for key")
+            # print("Stop Iteration for key")
+            pass
         else:
             #print ("key with Tom is " , key2)
             self.assertIn(key2, ["Ben", "Jen"])
@@ -230,7 +231,8 @@ class TestDoubleHash(unittest.TestCase):
         try:
             value2 = next(value_iterator2)
         except StopIteration:
-            print("Stop Iteration for value")
+            # print("Stop Iteration for value")
+            pass
         else:
            # print ("after next values with Tom are " , value2)
             self.assertIn(value2, [1, 6])
@@ -248,13 +250,14 @@ class TestDoubleHash(unittest.TestCase):
         del dt["Tom", "Tom"]
         del dt["Het", "Liz"]
 
-        print("after table delete\n" , str(dt))
+        # print("after table delete\n" , str(dt))
 
 
         try:
             key = next(key_iterator)
         except StopIteration:
-            print("Stop Iteration for key")
+            # print("Stop Iteration for key")
+            pass
         else:
             #print ("outer keys are " , key)
             self.assertIn(key, [])
@@ -262,7 +265,8 @@ class TestDoubleHash(unittest.TestCase):
         try:
             value = next(value_iterator)
         except StopIteration:
-            print("Stop Iteration for value")
+            # print("Stop Iteration for value")
+            pass
         else:
             #print ("all value are  " , value2)
             self.assertIn(value, [])
