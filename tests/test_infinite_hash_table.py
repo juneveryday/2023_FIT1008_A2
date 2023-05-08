@@ -54,7 +54,8 @@ class TestInfiniteHash(unittest.TestCase):
         ih["jake"] = 7
         ih["linger"] = 8
 
-        # print("all the added keys and values are\n",str(ih))
+        # print("all the added keys and values are")
+        # print(ih)
 
         del ih["limp"]
 
@@ -72,7 +73,8 @@ class TestInfiniteHash(unittest.TestCase):
         del ih["linger"]
         del ih["linked"]
 
-        # print("all the added keys and values are\n",str(ih))
+        # print("all the added keys and values are")
+        # print(ih)
 
         self.assertEqual(ih["lin"], 1)
         self.assertEqual(ih.get_location("lin"), [4])

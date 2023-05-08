@@ -100,7 +100,6 @@ class InfiniteHashTable(Generic[K, V]):
         current_array[current_index] = None
         self.count -= 1
 
-
         while not array_stack.is_empty():
             temp_list : list[tuple[K , V]] = []
             for i in range (len(current_array)):
@@ -182,32 +181,41 @@ class InfiniteHashTable(Generic[K, V]):
         Not required but may be a good testing tool.
         """
         result = ""
-        temp_stack : LinkedStack[ArrayR] = LinkedStack()
+        temp_stack : LinkedStack[tuple[int , ArrayR]] = LinkedStack()
         current_array : ArrayR = self.top_level_table
-        outer_string = self.array_traversal(current_array = current_array , stack = temp_stack)
-        result += outer_string
+        current_index = 0
+        temp_stack.push((current_index , current_array))
 
         while not temp_stack.is_empty():
-            current_array = temp_stack.pop()
-            inner_string = self.array_traversal(current_array = current_array , stack = temp_stack)
+            current_index , current_array = temp_stack.pop()
+            inner_string = self.array_traversal(start_index = current_index , current_array = current_array , stack = temp_stack)
 
             result += inner_string 
 
         return result
 
 
-    def array_traversal(self , current_array : ArrayR , stack : LinkedStack[ArrayR]) -> str:
+    def array_traversal(self , start_index : int , current_array : ArrayR , stack : LinkedStack[tuple[int , ArrayR]]) -> str:
         result = ""
     
-        for array_index in range (len(current_array)):
-            if current_array[array_index] != None:
-                current_key, current_value = current_array[array_index]
-                if isinstance(current_value , ArrayR):
-                    stack.push(current_value)
-                
-                else:
-                    result += str(current_key) + " , " + str(current_value) + "\n"
-
+        array_index = 0
+        while True:
+            for array_index in range (start_index , len(current_array)):
+                if current_array[array_index] != None:
+                    current_key, current_value = current_array[array_index]
+                    if isinstance(current_value , ArrayR):
+                        stack.push((array_index + 1 , current_array))
+                        current_array = current_value
+                        start_index = 0
+                        break
+                    
+                    else:
+                        result += str(current_key) + " , " + str(current_value) + "\n"
+            
+            if array_index == len(current_array) - 1:
+                break
+        
+        
         return result
 
 

@@ -202,8 +202,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
 
         outer_index, inner_index = self._linear_probe(key1 = key[0], key2 = key[1], is_insert = True)
-
-        inner_table = self.outer_hash_table[outer_index][1]
+        inner_table : LinearProbeTable[K2,V] = self.outer_hash_table[outer_index][1]
         inner_table[key[1]] = data
 
         if len(self) > self.table_size / 2:
@@ -219,7 +218,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         
         outer_index, inner_index = self._linear_probe(key1 = key[0], key2 = key[1], is_insert = False)
 
-        inner_table = self.outer_hash_table[outer_index][1]
+        inner_table : LinearProbeTable[K2,V] = self.outer_hash_table[outer_index][1]
 
         del inner_table[key[1]]
 
