@@ -140,7 +140,7 @@ class Trail:
         temp_stack_follow : LinkedStack[Trail] = LinkedStack()
         temp_new_trail : Trail = self
 
-        temp_new_trail.traverse_trail(stack = temp_stack_follow, personality = personality)
+        temp_stack_follow.push(temp_new_trail)
 
         while not temp_stack_follow.is_empty():
 
