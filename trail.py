@@ -135,7 +135,26 @@ class Trail:
 
 
     def follow_path(self, personality: WalkerPersonality) -> None:
-        """Follow a path and add mountains according to a personality."""
+
+        """
+        - Follow a path and add mountains according to a personality
+        - It uses the function 'traverse_trail' to do so
+        
+        Args:
+        - self
+        - personality - of WalkerPersonality class
+        
+        Raises:
+        - None
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(M * N) , where M is length of the stack and N is the length of the trail in each stck item
+        - Best case: O(1)
+        """
+        
 
         temp_stack_follow : LinkedStack[Trail] = LinkedStack()
         temp_new_trail : Trail = self
@@ -153,8 +172,19 @@ class Trail:
 
 
     def collect_all_mountains(self) -> list[Mountain]:
-        """Returns a list of all mountains on the trail."""
 
+        """
+        - Uses recursion to store all the mountains on the trail in a list and return it
+        
+        Args:
+        - self
+        
+        Raises:
+        - None
+
+        Returns:
+        - List of Mountain
+        """
 
         temp_mountain_list : list[Mountain] = []
 
@@ -176,12 +206,22 @@ class Trail:
         
 
 
-    def length_k_paths(self, k) -> list[list[Mountain]]: # Input to this should not exceed k > 50, at most 5 branches.
+    def length_k_paths(self, k : int) -> list[list[Mountain]]: # Input to this should not exceed k > 50, at most 5 branches.
+       
         """
-        Returns a list of all paths of containing exactly k mountains.
-        Paths are represented as lists of mountains.
+        - Returns a list of all paths of containing exactly k mountains
+        - Paths are represented as lists of mountains
+        - Paths are unique if they take a different branch, even if this results in the same set of mountains
 
-        Paths are unique if they take a different branch, even if this results in the same set of mountains.
+        Args:
+        - self
+        - k - input int given 
+        
+        Raises:
+        - None
+
+        Returns:
+        - List of List of Mountain  
         """
 
         list_of_mountains : list[list[Mountain]] = [[]]
@@ -198,6 +238,26 @@ class Trail:
 
 
     def traverse_trail(self, stack : LinkedStack , personality : WalkerPersonality) -> None:
+
+        """
+        - This function is used to traverse over a given trail and choose the next path depending on the WalkerPersonality 
+          and add mountains crossed simultaneously 
+
+        Args:
+        - self
+        - stack - of the LinkedStack class
+        - personality - of the WalkerPersonality class
+        
+        Raises:
+        - None
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(N) where N is the length of the trail, i.e. length before None is found
+        - Best case: O(1) 
+        """
         
         temp_new_trail = self
 
@@ -220,6 +280,20 @@ class Trail:
 
     
     def collect_mountain_list(self) -> list[list[Mountain]]:
+
+        """
+        - This function uses recursion to collect all the mountains in a given trail.
+
+        Args:
+        - self
+        
+        Raises:
+        - None
+
+        Returns:
+        - A list of list of Mountain 
+        """
+
         if self.store == None:
             return [[]]
         
@@ -252,6 +326,25 @@ class Trail:
 
             
     def combine_list(self, list1 : list[list[Mountain]] , list2 : list[list[Mountain]]) -> list[list[Mountain]]:
+
+        """
+        - This function is used to combine two list of lists and return the result
+
+        Args:
+        - self
+        - list1 : A list of list of Mountain
+        - list2 : A list of list of Mountain
+        
+        Raises:
+        - None
+
+        Returns:
+        - A list of list of Mountain
+
+        Complexity:
+        - Worst case: O(N * M) where N is the length of list1 and M is the length of list2
+        - Best case: O(1) 
+        """
 
         temp_list : list[list[Mountain]] = None
         for list_index1 in range (len(list1)):
