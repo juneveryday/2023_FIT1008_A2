@@ -24,6 +24,23 @@ class InfiniteHashTable(Generic[K, V]):
 
     def __init__(self) -> None:
 
+        """
+        - initializing self.top_level_Table, self.level and self.count.
+
+        Args:
+        - self
+        
+        Raises:
+        - None
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
+
         self.top_level_table : ArrayR[tuple[K,V|ArrayR [K,V]]] = ArrayR(length = self.TABLE_SIZE)
         self.level = 0
         self.count = 0
@@ -31,6 +48,24 @@ class InfiniteHashTable(Generic[K, V]):
 
 
     def hash(self, key: K) -> int:
+        """
+        - Hash the key for insert/retrieve/update into the hashtable based on level.
+
+        Args:
+        - self
+        - key : key
+        
+        Raises:
+        - None
+
+        Returns:
+        - int - hash code which is the index.
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
+
         if self.level < len(key):
             return ord(key[self.level]) % (self.TABLE_SIZE-1)
         return self.TABLE_SIZE-1
@@ -41,7 +76,19 @@ class InfiniteHashTable(Generic[K, V]):
         """
         Get the value at a certain key
 
-        :raises KeyError: when the key doesn't exist.
+        Args:
+        - self
+        - key
+        
+        Raises:
+        - KeyError: when the key doesn't exist.
+
+        Returns:
+        - value from the key.
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
         """
 
         index_list , array_stack = self._infinite_probe(key = key)
@@ -53,19 +100,34 @@ class InfiniteHashTable(Generic[K, V]):
     def __setitem__(self, key: K, value: V) -> None:
         """
         Set an (key, value) pair in our hash table.
+
+        Args:
+        - self
+        - key: K
+        - Value: V
+        
+        Raises:
+        - None
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(N * hash(key)) N: the number of array.
+        - Best case: O(hash(key))
         """
         self.level = 0
         outer_array = self.top_level_table
         
         while True:
-            index_position = self.hash(key = key)
+            index_position = self.hash(key = key)                                                   #O(1)
             
-            if outer_array[index_position] == None:
+            if outer_array[index_position] == None:                                                 #O(1)
                 outer_array[index_position] = (key,value)
                 self.count += 1
                 return
 
-            elif outer_array[index_position][0] == key:
+            elif outer_array[index_position][0] == key:                                             #O(1)
                 outer_array[index_position] = (key,value)
                 return
 
@@ -91,9 +153,20 @@ class InfiniteHashTable(Generic[K, V]):
         """
         Deletes a (key, value) pair in our hash table.
 
-        :raises KeyError: when the key doesn't exist.
-        """
+        Args:
+        - self
+        - key: K
         
+        Raises:
+        - KeyError: when the key doesn't exist.
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(_infinite_probe) where _infinite_probe is InfiniteHashTable class. 
+        - Best case: 
+        """
         index_list , array_stack = self._infinite_probe(key = key)
         current_array = array_stack.pop()
         current_index = index_list.pop()
@@ -121,7 +194,19 @@ class InfiniteHashTable(Generic[K, V]):
         """
         Get the sequence of positions required to access this key.
 
-        :raises KeyError: when the key doesn't exist.
+        Args:
+        - self
+        - key: K
+        
+        Raises:
+        - raises KeyError: when the key doesn't exist.
+
+        Returns:
+        - list from _infinite_probe.
+
+        Complexity:
+        - Worst case: O(_infinite_probe) where _infinite_probe is InfiniteHashTable class. 
+        - Best case : O(_infinite_probe) where _infinite_probe is InfiniteHashTable class. 
         """
 
         return self._infinite_probe(key = key)[0]
@@ -144,7 +229,22 @@ class InfiniteHashTable(Generic[K, V]):
     
     def _infinite_probe(self, key : K) -> tuple[list[int] , LinkedStack[ArrayR]] :
         """
+        Get the value at a certain key
+
+        Args:
+        - self
+        - key
         
+        Raises:
+        - KeyError: when the key doesn't exist.
+
+        Returns:
+        - index_list : list if there is the infinite list.
+        - array_stack: linkedstack which saves the each array.
+
+        Complexity:
+        - Worst case: O(N * hash(key)) where N is the number of Array. 
+        - Best case: O(hash(key))
         """
 
         self.level = 0
@@ -171,6 +271,22 @@ class InfiniteHashTable(Generic[K, V]):
 
 
     def __len__(self) -> int:
+        """
+        Returns number of elements in the hash table.
+
+        Args:
+        - self
+        
+        Raises:
+        - None
+
+        Returns:
+        - self.count
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
         return self.count
 
 
