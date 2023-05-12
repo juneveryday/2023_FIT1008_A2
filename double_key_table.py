@@ -162,8 +162,8 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         - Iterator
 
         Complexity:
-        - Worst case: 
-        - Best case: 
+        - Worst case: O(KeyIterator) , where KeyIterator is of DoubleKeyTable class
+        - Best case: O(KeyIterator)
         """
 
         return KeyIterator(outer_table = self, key = key) 
@@ -225,8 +225,8 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         - Iterator
 
         Complexity:
-        - Worst case: 
-        - Best case: 
+        - Worst case: O(ValueIterator) , where ValueIterator is of DoubleKeyTable class
+        - Best case: O(ValueIterator)
         """
 
         return ValueIterator(outer_table = self, key = key)

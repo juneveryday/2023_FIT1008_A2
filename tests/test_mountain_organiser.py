@@ -83,4 +83,3 @@ class TestInfiniteHash(unittest.TestCase):
         # print("list is " , mo.sorted_mountain_list)
         
         self.assertRaises(KeyError, lambda: mo.cur_position(m10)) 
-  

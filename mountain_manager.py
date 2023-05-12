@@ -173,5 +173,4 @@ class MountainManager:
                 grouped_list_diff.append(mount_value)
 
         return grouped_list_diff
-
         

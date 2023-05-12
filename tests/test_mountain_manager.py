@@ -105,4 +105,3 @@ class TestInfiniteHash(unittest.TestCase):
 
         self.assertEqual(make_set(res[3]), make_set([m10])) 
 
- 

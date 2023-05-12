@@ -84,3 +84,4 @@ class TestInfiniteHash(unittest.TestCase):
         ih["lin"] = 10
         self.assertEqual(ih.get_location("lin"), [4])
         self.assertEqual(len(ih), 1)
+        

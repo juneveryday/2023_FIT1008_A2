@@ -151,7 +151,7 @@ class Trail:
         - None
 
         Complexity:
-        - Worst case: O(M * N) , where M is length of the stack and N is the length of the trail in each stck item
+        - Worst case: O(M * traverse_trail) , where M is length of the stack and traverse_trail is of Trail class
         - Best case: O(1)
         """
         

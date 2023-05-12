@@ -78,4 +78,3 @@ class MountainOrganiser:
         temp_sort = mergesort(l = mountains, key = lambda a : (a.length , a.name)) # O(Mlog(M))
         self.sorted_mountain_list = merge(l1 = temp_sort , l2 = self.sorted_mountain_list , key = lambda a : (a.length , a.name)) # O(N)
  
-        
