@@ -39,3 +39,8 @@ def mergesort(l: list[T], key=lambda x:x) -> list[T]:
     l1 = mergesort(l[:break_index] , key = key)
     l2 = mergesort(l[break_index:] , key = key)
     return merge(l1, l2, key=key)
+
+"""
+Changes made:
+- added parameters in mergesort - key (lambda function)
+"""

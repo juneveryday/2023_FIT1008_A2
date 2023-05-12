@@ -87,8 +87,8 @@ class InfiniteHashTable(Generic[K, V]):
         - value from the key.
 
         Complexity:
-        - Worst case: O(1)
-        - Best case: O(1)
+        - Worst case: O(_infinite_probe) , where _infinite_probe is of InfiniteHashTable class
+        - Best case: O(_infinite_probe)
         """
 
         index_list , array_stack = self._infinite_probe(key = key)
@@ -113,21 +113,21 @@ class InfiniteHashTable(Generic[K, V]):
         - None
 
         Complexity:
-        - Worst case: O(N * hash(key)) N: the number of array.
+        - Worst case: O(N * hash(key)) , where N is the number of array.
         - Best case: O(hash(key))
         """
         self.level = 0
         outer_array = self.top_level_table
         
         while True:
-            index_position = self.hash(key = key)                                                   #O(1)
+            index_position = self.hash(key = key)                                                   
             
-            if outer_array[index_position] == None:                                                 #O(1)
+            if outer_array[index_position] == None:                                                
                 outer_array[index_position] = (key,value)
                 self.count += 1
                 return
 
-            elif outer_array[index_position][0] == key:                                             #O(1)
+            elif outer_array[index_position][0] == key:                                             
                 outer_array[index_position] = (key,value)
                 return
 
@@ -164,8 +164,8 @@ class InfiniteHashTable(Generic[K, V]):
         - None
 
         Complexity:
-        - Worst case: O(_infinite_probe) where _infinite_probe is InfiniteHashTable class. 
-        - Best case: 
+        - Worst case: O(_infinite_probe + N * M) where _infinite_probe is of InfiniteHashTable class, N is len(array_stack) and M is (len(current_array))
+        - Best case: O(_infinite_probe)
         """
         index_list , array_stack = self._infinite_probe(key = key)
         current_array = array_stack.pop()
@@ -173,9 +173,9 @@ class InfiniteHashTable(Generic[K, V]):
         current_array[current_index] = None
         self.count -= 1
 
-        while not array_stack.is_empty():
+        while not array_stack.is_empty(): 
             temp_list : list[tuple[K , V]] = []
-            for i in range (len(current_array)):
+            for i in range (len(current_array)): 
                 if current_array[i] != None:
                     if isinstance(current_array[i][1] , ArrayR):
                         return
@@ -205,8 +205,8 @@ class InfiniteHashTable(Generic[K, V]):
         - list from _infinite_probe.
 
         Complexity:
-        - Worst case: O(_infinite_probe) where _infinite_probe is InfiniteHashTable class. 
-        - Best case : O(_infinite_probe) where _infinite_probe is InfiniteHashTable class. 
+        - Worst case: O(_infinite_probe) where _infinite_probe is of InfiniteHashTable class. 
+        - Best case : O(_infinite_probe)
         """
 
         return self._infinite_probe(key = key)[0]

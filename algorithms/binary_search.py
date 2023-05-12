@@ -38,3 +38,9 @@ def _binary_search_aux(l: list[T], item: T, lo: int, hi: int , key = lambda x:x,
     elif key(l[mid]) == key(item):
         return mid
     raise ValueError(f"Comparison operator poorly implemented {item} and {l[mid]} cannot be compared.")
+
+"""
+Changes made:
+- added parameters - key (lambda function) and is_insert (boolean)
+- raised KeyError
+"""
