@@ -355,8 +355,9 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         - value
 
         Complexity:
-        - Worst case: 
-        - Best case: 
+        - Worst case: O(_linear_probe + other_function1 + M * other_function2) where _linear_probe is of DoubleKeyTable class, 
+            other_function1 is delitem of LinearProbeTable and other_function2 is _linear_probe of LinearProbeTable
+        - Best case: O(_linear_probe + other_function1) , when len(inner_table) != 0
         """
         
         outer_index, inner_index = self._linear_probe(key1 = key[0], key2 = key[1], is_insert = False)
@@ -395,11 +396,11 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         - None
 
         Returns:
-        - value
+        - None
 
         Complexity:
-        - Worst case: O(N*hash(K) + N^2*comp(K)) Lots of probing , where N is len(self)
-        - Best case: O(N*hash(K)) No probing
+        - Worst case: O(N * _linear_probe) , where N is len(old_outer_hash_table) and _linear_probe is of DoubleKeyTable
+        - Best case: O(N * _linear_probe) 
         """
 
         old_outer_hash_table = self.outer_hash_table
@@ -422,15 +423,43 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
     @property
     def table_size(self) -> int:
+        
         """
         Return the current size of the table (different from the length)
+
+        Args:
+        - self
+
+        Raises:
+        - None
+
+        Returns:
+        - int - current table size
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1) 
         """
         return len(self.outer_hash_table)
         
     
     def __len__(self) -> int:
+        
         """
         Returns number of elements in the hash table
+
+        Args:
+        - self
+
+        Raises:
+        - None
+
+        Returns:
+        - int - total number of elements in the hash table
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1) 
         """
         return self.outer_count
     
@@ -457,15 +486,73 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 class KeyIterator(Iterator[K1|K2]):
 
     def __init__ (self, outer_table : DoubleKeyTable , key : K1|None = None) -> None :
+
+        """
+        defining the magic method : __init__ 
+        - This initialises an object of the DoubleKeyTable class, iterated key and index position
+
+        Args:
+        - self
+        - outer_table - of DoubleKeyTable class
+        - key - outer key or None
+
+        Raises:
+        - None
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
+
         self.table = outer_table
         self.iterated_key = key
         self.index_position = 0
         
 
     def __iter__(self) -> Iterator[K1|K2]:
+
+        """
+        defining the magic method : __iter__ 
+        - it returns itself, i.e. iterator object
+
+        Args:
+        - self
+
+        Raises:
+        - None
+
+        Returns:
+        - Iterator
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
+
         return self
 
     def __next__(self) -> K1|K2:
+
+        """
+        defining the magic method : __next__ 
+        - it returns the next item
+
+        Args:
+        - self
+
+        Raises:
+        - Raises StopIteration
+
+        Returns:
+        - key - K1 or K2
+
+        Complexity:
+        - Worst case: O(N + find_key) , where N is the lenght of self.table.outer_hash_table and find_key is of DoubleKeyTable class (worst case)
+        - Best case: O(find_key) , this would take the best case of find_key
+        """
 
         if self.iterated_key == None:
             temp_key = self.find_key(self.table.outer_hash_table)
@@ -493,6 +580,24 @@ class KeyIterator(Iterator[K1|K2]):
 
     def find_key(self, array : ArrayR) -> K1|K2:
 
+        """
+        - This is to find the key needed
+
+        Args:
+        - self
+        - array - of ArrayR class
+
+        Raises:
+        - None
+
+        Returns:
+        - key - K1 or K2
+
+        Complexity:
+        - Worst case: O(N) , where N is the length of array
+        - Best case: O(1)
+        """
+
         for _ in range (self.index_position, len(array)):
 
             if array[self.index_position] != None:
@@ -509,15 +614,73 @@ class KeyIterator(Iterator[K1|K2]):
 class ValueIterator(Iterator[V]):
 
     def __init__ (self, outer_table : DoubleKeyTable , key : K1|None = None) -> None :
+
+        """
+        defining the magic method : __init__ 
+        - This initialises an object of the DoubleKeyTable class, iterated key, index position and inner index position
+
+        Args:
+        - self
+        - outer_table - of DoubleKeyTable class
+        - key - outer key or None
+
+        Raises:
+        - None
+
+        Returns:
+        - None
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
+
         self.table = outer_table
         self.iterated_key = key
         self.index_position = 0
         self.inner_index_position = 0
 
     def __iter__(self) -> Iterator[V]:
+
+        """
+        defining the magic method : __iter__ 
+        - it returns itself, i.e. iterator object
+
+        Args:
+        - self
+
+        Raises:
+        - None
+
+        Returns:
+        - Iterator
+
+        Complexity:
+        - Worst case: O(1)
+        - Best case: O(1)
+        """
+
         return self
 
     def __next__(self) -> V:
+
+        """
+        defining the magic method : __next__ 
+        - it returns the next item
+
+        Args:
+        - self
+
+        Raises:
+        - Raises StopIteration
+
+        Returns:
+        - value - of the input keys
+
+        Complexity:
+        - Worst case: O(N * find_value) , where N is the lenght of self.table.outer_hash_table and find_value is of DoubleKeyTable class (worst case)
+        - Best case: O(N + find_value) , this would take the best case of find_value
+        """
 
         if self.iterated_key == None:
 
@@ -549,6 +712,24 @@ class ValueIterator(Iterator[V]):
 
 
     def find_value(self, array : ArrayR) -> V:
+
+        """
+        - This is to find the value needed
+
+        Args:
+        - self
+        - array - of ArrayR class
+
+        Raises:
+        - None
+
+        Returns:
+        - value - of the input keys
+
+        Complexity:
+        - Worst case: O(N) , where N is the length of array
+        - Best case: O(1)
+        """
 
         for _ in range (self.inner_index_position, len(array)):
             if array[self.inner_index_position] != None:
